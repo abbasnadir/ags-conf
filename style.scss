@@ -35,12 +35,13 @@ window.aiChat {
   background: transparent;
 
   .ai-chat-panel {
-    min-width: 430px;
+    min-width: 400px;
     padding: 22px;
     border: 1px solid rgba(164, 185, 255, 0.24);
     border-radius: 18px;
     background: rgba(16, 21, 32, 0.97);
     box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+    transition: none;
   }
 
   .ai-resize-handle {
@@ -76,13 +77,14 @@ window.aiChat {
   }
 
   .ai-chat-browser {
-    min-width: 1080px;
+    min-width: 400px;
     min-height: 760px;
     padding: 12px;
     border: 1px solid rgba(164, 185, 255, 0.24);
     border-radius: 18px;
-    background: rgba(16, 21, 32, 0.97);
+    background: rgba(0, 0, 0, 0.97);
     box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+    transition: none;
   }
 
   .ai-browser-toolbar {
@@ -138,7 +140,7 @@ window.aiChat {
     border-radius: 9px;
     color: #dce6ff;
     font-weight: 800;
-    background: rgba(112, 143, 255, 0.2);
+    background: rgba(70, 199, 0, 0.2);
   }
 
   .ai-provider-name {
@@ -156,10 +158,10 @@ window.aiChat {
 
   entry {
     padding: 10px 12px;
-    border: 1px solid rgba(164, 185, 255, 0.2);
+    border: 1px solid rgba(151, 21, 21, 0.2);
     border-radius: 10px;
     color: #eef3ff;
-    background: rgba(255, 255, 255, 0.055);
+    background: rgba(224, 165, 165, 0.055);
   }
 
   entry:focus {
