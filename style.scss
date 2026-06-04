@@ -1,0 +1,180 @@
+// https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
+$fg-color: #{"@theme_fg_color"};
+$bg-color: #{"@theme_bg_color"};
+
+
+window.batteryBar {
+  background: transparent;
+  color: rgb(210, 201, 63);
+  font-weight: bold;
+
+  .battery-glow {
+    background: linear-gradient(to bottom, #06ff0e5c, #06ff0e22 30%, transparent);
+  }
+
+  .battery-glow.warning {
+    background: linear-gradient(to bottom, #ffdd065c, #ffdd0622 30%, transparent);
+  }
+
+  .battery-glow.critical {
+    background: linear-gradient(to bottom, #ff24065c, #ff240622 30%, transparent);
+  }
+
+  .battery-empty {
+    background: linear-gradient(to bottom, #ffffff5c, #ffffff22 30%, transparent);
+  }
+}
+
+window.topBar {
+  background: transparent;
+  color: $fg-color;
+  font-weight: bold;
+}
+
+window.aiChat {
+  background: transparent;
+
+  .ai-chat-panel {
+    min-width: 430px;
+    padding: 22px;
+    border: 1px solid rgba(164, 185, 255, 0.24);
+    border-radius: 18px;
+    background: rgba(16, 21, 32, 0.97);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+  }
+
+  .ai-resize-handle {
+    min-width: 16px;
+    min-height: 16px;
+    margin: 6px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .ai-resize-handle:hover {
+    background: rgba(255, 255, 255, 0.28);
+  }
+
+  .ai-chat-title {
+    color: #f4f7ff;
+    font-size: 22px;
+    font-weight: 800;
+  }
+
+  .ai-chat-subtitle,
+  .ai-provider-hint,
+  .ai-chat-footer {
+    color: rgba(220, 228, 246, 0.62);
+  }
+
+  .ai-chat-command {
+    padding: 10px 12px;
+    border-radius: 9px;
+    color: #dce6ff;
+    font-family: monospace;
+    background: rgba(112, 143, 255, 0.12);
+  }
+
+  .ai-chat-browser {
+    min-width: 1080px;
+    min-height: 760px;
+    padding: 12px;
+    border: 1px solid rgba(164, 185, 255, 0.24);
+    border-radius: 18px;
+    background: rgba(16, 21, 32, 0.97);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+  }
+
+  .ai-browser-toolbar {
+    padding: 2px;
+  }
+
+  .ai-browser-address {
+    padding: 0 8px;
+    color: rgba(220, 228, 246, 0.7);
+  }
+
+  .ai-browser-control {
+    min-height: 30px;
+    padding: 0 10px;
+    border-radius: 8px;
+    color: rgba(234, 240, 255, 0.82);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .ai-browser-content {
+    border-radius: 12px;
+    background: #ffffff;
+  }
+
+  button {
+    border: 0;
+    color: #eaf0ff;
+    background: transparent;
+  }
+
+  button:hover {
+    background: rgba(126, 156, 255, 0.14);
+  }
+
+  .ai-chat-close {
+    min-width: 30px;
+    min-height: 30px;
+    border-radius: 999px;
+    color: rgba(234, 240, 255, 0.72);
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .ai-provider {
+    padding: 11px 12px;
+    border: 1px solid rgba(164, 185, 255, 0.12);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.035);
+  }
+
+  .ai-provider-badge {
+    min-width: 32px;
+    min-height: 32px;
+    border-radius: 9px;
+    color: #dce6ff;
+    font-weight: 800;
+    background: rgba(112, 143, 255, 0.2);
+  }
+
+  .ai-provider-name {
+    color: #eef3ff;
+    font-weight: 700;
+  }
+
+  .ai-provider-open {
+    color: rgba(168, 190, 255, 0.86);
+  }
+
+  .ai-custom-url {
+    padding-top: 2px;
+  }
+
+  entry {
+    padding: 10px 12px;
+    border: 1px solid rgba(164, 185, 255, 0.2);
+    border-radius: 10px;
+    color: #eef3ff;
+    background: rgba(255, 255, 255, 0.055);
+  }
+
+  entry:focus {
+    border-color: rgba(124, 157, 255, 0.68);
+  }
+
+  .ai-custom-open {
+    padding: 0 15px;
+    border-radius: 10px;
+    color: #f5f7ff;
+    font-weight: 700;
+    background: rgba(89, 125, 255, 0.72);
+  }
+
+  .ai-custom-open:hover {
+    background: rgba(112, 143, 255, 0.92);
+  }
+}
