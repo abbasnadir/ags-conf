@@ -2,166 +2,196 @@ import app from "ags/gtk4/app"
 import { Astal, Gtk, Gdk } from "ags/gtk4"
 import { createState, createComputed } from "gnim"
 import Cairo from "cairo"
+import GLib from "gi://GLib"
+import Gio from "gi://Gio"
+
+// Fix for Wayland Protocol error 71 (DMA-BUF renderer crash on file dialogs)
+GLib.setenv("WEBKIT_DISABLE_DMABUF_RENDERER", "1", true)
+// Fix for WebKitGTK hanging on ChatGPT when typing long texts
+GLib.setenv("WEBKIT_DISABLE_COMPOSITING_MODE", "1", true)
 
 const WebKit = await import("gi://WebKit?version=6.0")
     .then(({ default: WebKit }) => WebKit)
     .catch(() => null)
 
 const WINDOW_NAME = "aiChat"
+const CONFIG_PATH = GLib.get_home_dir() + "/.config/ags/widget/AIChat/config.json"
+const WEBKIT_DATA_DIR = GLib.get_home_dir() + "/.config/ags/widget/AIChat/webkit_data"
 
-const providers = [
+const defaultProviders = [
     { name: "ChatGPT", badge: "G", url: "https://chatgpt.com" },
     { name: "Gemini", badge: "Ge", url: "https://gemini.google.com/app" },
     { name: "Claude", badge: "C", url: "https://claude.ai/new" },
     { name: "Perplexity", badge: "P", url: "https://www.perplexity.ai" },
 ]
 
-const MIN_PICKER_WIDTH = 430
-const MIN_PICKER_HEIGHT = 320
+let config = {
+    providers: defaultProviders,
+    lastSelected: "https://chatgpt.com"
+}
+
+function loadConfig() {
+    try {
+        const file = Gio.File.new_for_path(CONFIG_PATH)
+        const [success, contents] = file.load_contents(null)
+        if (success) {
+            const data = JSON.parse(new TextDecoder("utf-8").decode(contents))
+            if (data.providers) config.providers = data.providers
+            if (data.lastSelected) config.lastSelected = data.lastSelected
+        }
+    } catch (e) {
+        saveConfig()
+    }
+}
+
+function saveConfig() {
+    try {
+        const file = Gio.File.new_for_path(CONFIG_PATH)
+        const dir = file.get_parent()
+        if (dir && !dir.query_exists(null)) {
+            dir.make_directory_with_parents(null)
+        }
+        const encoder = new TextEncoder()
+        file.replace_contents(encoder.encode(JSON.stringify(config, null, 2)), null, false, Gio.FileCreateFlags.NONE, null)
+    } catch (e) {
+        console.error("Failed to save config:", e)
+    }
+}
+
+loadConfig()
+
 const MIN_BROWSER_WIDTH = 430
 const MIN_BROWSER_HEIGHT = 430
-const RESIZE_BORDER = 10
+const DEFAULT_WIDTH = 450
+const DEFAULT_HEIGHT = 550
+const RESIZE_BORDER = 14
+
+const FAVICON_CACHE_DIR = GLib.get_home_dir() + "/.config/ags/widget/AIChat/favicon_cache"
+
+// Ensure favicon cache dir exists
+try {
+    const cacheDir = Gio.File.new_for_path(FAVICON_CACHE_DIR)
+    if (!cacheDir.query_exists(null)) cacheDir.make_directory_with_parents(null)
+} catch (_) { }
+
+function getFaviconPath(url: string): string | null {
+    try {
+        const domain = url.replace(/^https?:\/\//, "").replace(/\/.*$/, "")
+        const cachePath = `${FAVICON_CACHE_DIR}/${domain}.png`
+        const cacheFile = Gio.File.new_for_path(cachePath)
+        if (cacheFile.query_exists(null)) return cachePath
+        // Download favicon from Google's service
+        const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}&sz=64`
+        const [ok] = GLib.spawn_command_line_sync(`curl -sL -o ${cachePath} "${faviconUrl}"`)
+        if (ok && cacheFile.query_exists(null)) return cachePath
+    } catch (_) { }
+    return null
+}
 
 const clamp = (value: number, min: number, max: number) =>
     Math.min(max, Math.max(min, value))
 
 function normalizeUrl(value: string) {
     const url = value.trim()
-
     if (!url) return null
     if (/^[a-z][a-z\d+.-]*:\/\//i.test(url)) return url
-
     return `https://${url}`
 }
 
 function addEscapeHandler(window: Astal.Window) {
     const controller = new Gtk.EventControllerKey()
-
     controller.connect("key-pressed", (_, keyval) => {
         if (keyval !== Gdk.KEY_Escape) return false
-
         window.hide()
         return true
     })
-
     window.add_controller(controller)
 }
 
-function MissingWebKitWindow() {
-    let windowRef: Astal.Window | null = null
-    let panelRef: Gtk.Widget | null = null
-    let lastInputRegion = ""
-
-    const updateInputRegion = () => {
-        if (!windowRef || !panelRef) return
-
-        const surface = windowRef.get_surface()
-        if (!surface) return
-
-        const [ok, x, y] = panelRef.translate_coordinates(windowRef, 0, 0)
-        if (!ok) return
-
-        const width = panelRef.get_allocated_width()
-        const height = panelRef.get_allocated_height()
-        if (width <= 0 || height <= 0) return
-
-        const currentRegion = `${x},${y},${width},${height}`
-        if (lastInputRegion === currentRegion) return
-        lastInputRegion = currentRegion
-
-        const region = new Cairo.Region()
-        region.unionRectangle({
-            x: Math.round(x),
-            y: Math.round(y),
-            width: Math.round(width),
-            height: Math.round(height),
-        })
-        surface.set_input_region(region)
-    }
-
-    const setupWindow = (window: Astal.Window) => {
-        windowRef = window
-        addEscapeHandler(window)
-        window.connect("realize", updateInputRegion)
-    }
-
-    const scheduleInputRegionUpdate = (panel: Gtk.Widget) => {
-        panel.add_tick_callback(() => {
-            updateInputRegion()
-            return true
-        })
-    }
-
-    const trackPanel = (panel: Gtk.Widget) => {
-        panelRef = panel
-        panel.connect("realize", () => scheduleInputRegionUpdate(panel))
-    }
-
-    return (
-        <window
-            name={WINDOW_NAME}
-            visible={false}
-            class="aiChat"
-            $={setupWindow}
-            exclusivity={Astal.Exclusivity.IGNORE}
-            keymode={Astal.Keymode.ON_DEMAND}
-            anchor={
-                Astal.WindowAnchor.TOP |
-                Astal.WindowAnchor.BOTTOM |
-                Astal.WindowAnchor.LEFT |
-                Astal.WindowAnchor.RIGHT
-            }>
-            <box class="ai-chat-backdrop">
-                <box
-                    class="ai-chat-panel"
-                    orientation={Gtk.Orientation.VERTICAL}
-                    spacing={14}
-                    halign={Gtk.Align.CENTER}
-                    valign={Gtk.Align.CENTER}
-                    $={(self) => trackPanel(self)}>
-                    <label class="ai-chat-title" label="WebKit required" halign={Gtk.Align.START} />
-                    <label
-                        class="ai-chat-subtitle"
-                        label="Install embedded browser support, then restart AGS:"
-                        halign={Gtk.Align.START} />
-                    <label
-                        class="ai-chat-command"
-                        label="sudo pacman -S --needed webkitgtk-6.0"
-                        halign={Gtk.Align.START} />
-                    <button
-                        class="ai-custom-open"
-                        onClicked={() => app.get_window(WINDOW_NAME)?.hide()}>
-                        <label label="Close" />
-                    </button>
-                </box>
-            </box>
-        </window>
-    )
-}
-
 export default function ChatWindow() {
-    if (!WebKit) return MissingWebKitWindow()
+    if (!WebKit) {
+        console.error("WebKit is missing. Please install webkitgtk-6.0")
+        return <window name={WINDOW_NAME} visible={false} />
+    }
 
-    let picker!: Gtk.Widget
     let browser!: Gtk.Widget
     let address!: Gtk.Label
     let backButton!: Gtk.Button
     let windowRef: Astal.Window | null = null
-    let activePanel: Gtk.Widget | null = null
     let hasPosition = false
-    let customUrl = ""
     let lastInputRegion = ""
     let isDragging = false
+    let sidebar!: Gtk.Widget
+    let regionUpdateQueued = false
 
     const [panelX, setPanelX] = createState(0)
     const [panelY, setPanelY] = createState(0)
+    const [providers, setProviders] = createState([...config.providers])
 
     const panelMarginStart = createComputed(() => Math.round(panelX()))
     const panelMarginTop = createComputed(() => Math.round(panelY()))
 
-    const webView = new WebKit.WebView()
+    const dataDir = `${GLib.get_user_data_dir()}/ags-ai-chat`
+    const cacheDir = `${GLib.get_user_cache_dir()}/ags-ai-chat`
+
+    // In WebKit 6.0, NetworkSession replaces WebsiteDataManager and WebContext.
+    const session = (WebKit as any).NetworkSession.new(dataDir, cacheDir)
+
+    const cookieManager = session.get_cookie_manager()
+    cookieManager.set_persistent_storage(`${dataDir}/cookies.sqlite`, (WebKit as any).CookiePersistentStorage.SQLITE)
+
+    // Enable WebRTC for microphone/audio support and allow clipboard access
+    const settings = new (WebKit as any).Settings()
+    settings.enable_webrtc = true
+    settings.enable_developer_extras = true
+    settings.javascript_can_access_clipboard = true
+
+    const webView = new WebKit.WebView({
+        network_session: session,
+        settings: settings,
+    } as any)
+
+    // Automatically allow media/audio permission requests
+    webView.connect("permission-request", (_, request) => {
+        request.allow()
+        return true
+    })
+
+    // Intercept file chooser to prevent Wayland protocol crash (Error 71) on Layer Shell
+    webView.connect("run-file-chooser", (_, request) => {
+        const dialog = new Gtk.FileDialog()
+        if (request.get_select_multiple()) {
+            dialog.open_multiple(null, null, (d, res) => {
+                try {
+                    const files = d!.open_multiple_finish(res)
+                    const paths: string[] = []
+                    for (let i = 0; i < files.get_n_items(); i++) {
+                        const f = files.get_item(i) as any
+                        if (f && typeof f.get_path === "function" && f.get_path()) {
+                            paths.push(f.get_path()!)
+                        }
+                    }
+                    if (paths.length > 0) request.select_files(paths)
+                    else request.cancel()
+                } catch (e) { request.cancel() }
+            })
+        } else {
+            dialog.open(null, null, (d, res) => {
+                try {
+                    const file = d!.open_finish(res) as any
+                    const path = file && typeof file.get_path === "function" ? file.get_path() : null
+                    if (path) request.select_files([path])
+                    else request.cancel()
+                } catch (e) { request.cancel() }
+            })
+        }
+        return true
+    })
+
     webView.hexpand = true
     webView.vexpand = true
+
+    webView.load_uri(config.lastSelected)
 
     const updateBrowserHeader = () => {
         address.label = webView.uri ?? ""
@@ -173,22 +203,17 @@ export default function ChatWindow() {
 
     const getWindowSize = () => {
         const surface = windowRef?.get_surface()
-
         if (!surface) return { width: 0, height: 0 }
-
         return { width: surface.get_width(), height: surface.get_height() }
     }
 
     const maybeCenterPanel = () => {
-        if (hasPosition || !windowRef || !activePanel) return
-
+        if (hasPosition || !windowRef || !browser) return
         const windowSize = getWindowSize()
         if (windowSize.width <= 100 || windowSize.height <= 100) return
-
-        const width = activePanel.get_allocated_width()
-        const height = activePanel.get_allocated_height()
+        const width = browser.get_allocated_width()
+        const height = browser.get_allocated_height()
         if (width <= 10 || height <= 10) return
-
         setPanelX(Math.round((windowSize.width - width) / 2))
         setPanelY(Math.round((windowSize.height - height) / 2))
         hasPosition = true
@@ -207,186 +232,140 @@ export default function ChatWindow() {
     }
 
     const updateInputRegion = () => {
-        if (isDragging || !windowRef || !activePanel) return
-
+        if (!windowRef || !browser) return
         maybeCenterPanel()
-
         const surface = windowRef.get_surface()
         if (!surface) return
-
-        const rw = activePanel.get_allocated_width()
-        const rh = activePanel.get_allocated_height()
+        const rw = browser.get_allocated_width()
+        const rh = browser.get_allocated_height()
         if (rw <= 0 || rh <= 0) return
-
         const rx = panelX()
         const ry = panelY()
-
         const currentRegion = `${rx},${ry},${rw},${rh}`
         if (lastInputRegion === currentRegion) return
         lastInputRegion = currentRegion
-
         const region = new Cairo.Region()
-        region.unionRectangle({ x: rx, y: ry, width: rw, height: rh })
+        // Add a generous margin around the panel so resize handles are always reachable
+        const margin = RESIZE_BORDER + 5
+        const ws = getWindowSize()
+        region.unionRectangle({
+            x: Math.max(0, rx - margin),
+            y: Math.max(0, ry - margin),
+            width: Math.min(rw + margin * 2, ws.width - Math.max(0, rx - margin)),
+            height: Math.min(rh + margin * 2, ws.height - Math.max(0, ry - margin)),
+        })
         surface.set_input_region(region)
     }
 
-    const scheduleInputRegionUpdate = (panel?: Gtk.Widget) => {
-        const target = panel ?? activePanel
-        if (!target) return
-
-        target.add_tick_callback(() => {
+    // Debounced region update to avoid excessive calls during drag
+    const queueRegionUpdate = () => {
+        if (regionUpdateQueued) return
+        regionUpdateQueued = true
+        GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+            regionUpdateQueued = false
             updateInputRegion()
+            return GLib.SOURCE_REMOVE
+        })
+    }
+
+    const scheduleInputRegionUpdate = (panel?: Gtk.Widget) => {
+        const target = panel ?? browser
+        if (!target) return
+        target.add_tick_callback(() => {
+            if (!isDragging) updateInputRegion()
             return true
         })
     }
 
-    const setActivePanel = (panel: Gtk.Widget) => {
-        activePanel = panel
-        maybeCenterPanel()
-        updateInputRegion()
-        scheduleInputRegionUpdate(panel)
-    }
-
     const setCursor = (widget: Gtk.Widget, name: string) => {
-        try {
-            widget.set_cursor(Gdk.Cursor.new_from_name(name, null))
-        } catch (_) { /* cursor unavailable */ }
+        try { widget.set_cursor(Gdk.Cursor.new_from_name(name, null)) } catch (_) { }
     }
 
     const attachMoveController = (widget: Gtk.Widget, getPanel: () => Gtk.Widget | null) => {
         const controller = new Gtk.GestureDrag()
-        let startPanelX = 0
-        let startPanelY = 0
-        let startWinX = 0
-        let startWinY = 0
-        let startWidgetX = 0
-        let startWidgetY = 0
-
-        const isInteractive = (target: Gtk.Widget | null) => {
+        let startPanelX = 0, startPanelY = 0, startWinX = 0, startWinY = 0, startWidgetX = 0, startWidgetY = 0
+        const isInteractive = (target: Gtk.Widget | null): boolean => {
             if (!target) return false
             if (target instanceof Gtk.Button) return true
             if (target instanceof Gtk.Entry) return true
             if (WebKit && target instanceof WebKit.WebView) return true
             if (target instanceof Gtk.ScrolledWindow) return true
+            // Walk up the widget tree to check parent interactivity
+            const parent = target.get_parent()
+            if (parent && parent !== widget) return isInteractive(parent)
             return false
         }
-
         controller.connect("drag-begin", (_c: any, sx: number, sy: number) => {
             const target = widget.pick(sx, sy, Gtk.PickFlags.DEFAULT)
-            if (isInteractive(target)) {
-                controller.set_state(Gtk.EventSequenceState.DENIED)
-                return
-            }
-
+            if (isInteractive(target)) { controller.set_state(Gtk.EventSequenceState.DENIED); return }
             if (!windowRef) return
-            startWidgetX = sx
-            startWidgetY = sy
+            startWidgetX = sx; startWidgetY = sy
             const [ok, wx, wy] = widget.translate_coordinates(windowRef, sx, sy)
-            if (ok) {
-                startWinX = wx
-                startWinY = wy
-            }
-            startPanelX = panelX()
-            startPanelY = panelY()
+            if (ok) { startWinX = wx; startWinY = wy }
+            startPanelX = panelX(); startPanelY = panelY()
             isDragging = true
             setFullInputRegion()
         })
-
         const endDrag = () => {
             isDragging = false
+            lastInputRegion = ""
             widget.set_cursor(null)
             updateInputRegion()
         }
         controller.connect("drag-end", endDrag)
         controller.connect("cancel", endDrag)
-
         controller.connect("drag-update", (_c: any, ox: number, oy: number) => {
             const panel = getPanel()
             if (!windowRef || !panel) return
-
             const [ok, wx, wy] = widget.translate_coordinates(windowRef, startWidgetX + ox, startWidgetY + oy)
             if (!ok) return
-
-            const trueOffsetX = wx - startWinX
-            const trueOffsetY = wy - startWinY
-
+            const trueOffsetX = wx - startWinX; const trueOffsetY = wy - startWinY
             const windowSize = getWindowSize()
-            const pw = panel.get_allocated_width()
-            const ph = panel.get_allocated_height()
-
+            const pw = panel.get_allocated_width(); const ph = panel.get_allocated_height()
             const nextX = clamp(startPanelX + trueOffsetX, 0, Math.max(0, windowSize.width - pw))
             const nextY = clamp(startPanelY + trueOffsetY, 0, Math.max(0, windowSize.height - ph))
-
-            setPanelX(Math.round(nextX))
-            setPanelY(Math.round(nextY))
+            setPanelX(Math.round(nextX)); setPanelY(Math.round(nextY))
             hasPosition = true
         })
-
         widget.add_controller(controller)
-
         const motion = new Gtk.EventControllerMotion()
         motion.connect("motion", (_m: any, mx: number, my: number) => {
             if (isDragging) return
-            const target = widget.pick(mx, my, Gtk.PickFlags.DEFAULT)
+            widget.pick(mx, my, Gtk.PickFlags.DEFAULT)
         })
-        motion.connect("leave", () => {
-            if (!isDragging) widget.set_cursor(null)
-        })
+        motion.connect("leave", () => { if (!isDragging) widget.set_cursor(null) })
         widget.add_controller(motion)
     }
 
     const attachResizeHandle = (widget: Gtk.Widget, getPanel: () => Gtk.Widget | null, edge: string, minW: number, minH: number) => {
         const controller = new Gtk.GestureDrag()
-        let startWidth = 0
-        let startHeight = 0
-        let startPanelX = 0
-        let startPanelY = 0
-        let startWinX = 0
-        let startWinY = 0
-        let startWidgetX = 0
-        let startWidgetY = 0
-
+        let startWidth = 0, startHeight = 0, startPanelX = 0, startPanelY = 0, startWinX = 0, startWinY = 0, startWidgetX = 0, startWidgetY = 0
         controller.connect("drag-begin", (_c: any, sx: number, sy: number) => {
             const panel = getPanel()
             if (!panel || !windowRef) return
-            startWidgetX = sx
-            startWidgetY = sy
+            startWidgetX = sx; startWidgetY = sy
             const [ok, wx, wy] = widget.translate_coordinates(windowRef, sx, sy)
-            if (ok) {
-                startWinX = wx
-                startWinY = wy
-            }
-            startWidth = panel.get_allocated_width()
-            startHeight = panel.get_allocated_height()
-            startPanelX = panelX()
-            startPanelY = panelY()
+            if (ok) { startWinX = wx; startWinY = wy }
+            startWidth = panel.get_allocated_width(); startHeight = panel.get_allocated_height()
+            startPanelX = panelX(); startPanelY = panelY()
             isDragging = true
             setFullInputRegion()
         })
-
         const endDrag = () => {
             isDragging = false
+            lastInputRegion = ""
             updateInputRegion()
         }
         controller.connect("drag-end", endDrag)
         controller.connect("cancel", endDrag)
-
         controller.connect("drag-update", (_c: any, ox: number, oy: number) => {
             const panel = getPanel()
             if (!panel || !windowRef) return
-
             const [ok, wx, wy] = widget.translate_coordinates(windowRef, startWidgetX + ox, startWidgetY + oy)
             if (!ok) return
-
-            const trueOffsetX = wx - startWinX
-            const trueOffsetY = wy - startWinY
-
+            const trueOffsetX = wx - startWinX; const trueOffsetY = wy - startWinY
             const windowSize = getWindowSize()
-            let nw = startWidth
-            let nh = startHeight
-            let nx = startPanelX
-            let ny = startPanelY
-
+            let nw = startWidth, nh = startHeight, nx = startPanelX, ny = startPanelY
             if (edge.includes("e")) {
                 const maxW = Math.max(minW, windowSize.width - startPanelX)
                 nw = clamp(startWidth + trueOffsetX, minW, maxW)
@@ -405,27 +384,18 @@ export default function ChatWindow() {
                 nh = clamp(startHeight - trueOffsetY, minH, maxH)
                 ny = startPanelY + (startHeight - nh)
             }
-
             panel.set_size_request(Math.round(nw), Math.round(nh))
-            setPanelX(Math.round(nx))
-            setPanelY(Math.round(ny))
+            setPanelX(Math.round(nx)); setPanelY(Math.round(ny))
         })
-
         widget.add_controller(controller)
-
         const motion = new Gtk.EventControllerMotion()
         motion.connect("enter", () => setCursor(widget, `${edge}-resize`))
-        motion.connect("leave", () => {
-            if (!isDragging) widget.set_cursor(null)
-        })
+        motion.connect("leave", () => { if (!isDragging) widget.set_cursor(null) })
         widget.add_controller(motion)
     }
 
     const trackPanel = (panel: Gtk.Widget) => {
-        panel.connect("realize", () => {
-            if (!activePanel) setActivePanel(panel)
-            scheduleInputRegionUpdate(panel)
-        })
+        panel.connect("realize", () => scheduleInputRegionUpdate(panel))
     }
 
     const setupWindow = (window: Astal.Window) => {
@@ -434,31 +404,46 @@ export default function ChatWindow() {
         window.connect("realize", () => scheduleInputRegionUpdate())
     }
 
-    const showPicker = () => {
-        browser.visible = false
-        picker.visible = true
-        setActivePanel(picker)
+    const toggleSidebar = () => {
+        sidebar.visible = !sidebar.visible
     }
 
     const openChat = (value: string) => {
         const url = normalizeUrl(value)
-
         if (!url) return
-
-        picker.visible = false
-        browser.visible = true
-        setActivePanel(browser)
+        sidebar.visible = false
         address.label = url
+        config.lastSelected = url
+        saveConfig()
         webView.load_uri(url)
     }
 
     const goBack = () => {
         if (webView.can_go_back()) {
             webView.go_back()
-        } else {
-            showPicker()
         }
     }
+
+    const removeProvider = (index: number) => {
+        const arr = [...providers()]
+        arr.splice(index, 1)
+        setProviders(arr)
+        config.providers = arr
+        saveConfig()
+    }
+
+    const addProvider = (name: string, url: string) => {
+        const cleanUrl = normalizeUrl(url)
+        if (!name || !cleanUrl) return
+        const arr = [...providers(), { name, badge: name.charAt(0).toUpperCase(), url: cleanUrl }]
+        setProviders(arr)
+        config.providers = arr
+        saveConfig()
+    }
+
+
+    let addNameEntry!: Gtk.Entry
+    let addUrlEntry!: Gtk.Entry
 
     return (
         <window
@@ -470,12 +455,7 @@ export default function ChatWindow() {
             layer={Astal.Layer.OVERLAY}
             exclusivity={Astal.Exclusivity.IGNORE}
             keymode={Astal.Keymode.ON_DEMAND}
-            anchor={
-                Astal.WindowAnchor.TOP |
-                Astal.WindowAnchor.BOTTOM |
-                Astal.WindowAnchor.LEFT |
-                Astal.WindowAnchor.RIGHT
-            }>
+            anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.BOTTOM | Astal.WindowAnchor.LEFT | Astal.WindowAnchor.RIGHT}>
             <overlay class="ai-chat-backdrop" hexpand vexpand>
                 <box hexpand vexpand />
 
@@ -486,104 +466,29 @@ export default function ChatWindow() {
                     marginStart={panelMarginStart}
                     marginTop={panelMarginTop}
                     $={(self) => {
-                        picker = self
-                        trackPanel(self)
-                    }}>
-                    <box class="ai-chat-panel ai-chat-picker" orientation={Gtk.Orientation.VERTICAL} spacing={18} css="margin: 15px;" $={(self) => attachMoveController(self, () => picker)}>
-                        <box class="ai-drag-handle" spacing={12}>
-                            <box orientation={Gtk.Orientation.VERTICAL} spacing={3} hexpand>
-                                <label class="ai-chat-title" label="AI Chat" halign={Gtk.Align.START} />
-                            </box>
-                            <button
-                                class="ai-chat-close"
-                                tooltipText="Close"
-                                onClicked={() => app.get_window(WINDOW_NAME)?.hide()}>
-                                <label label="x" />
-                            </button>
-                        </box>
-
-                        <box class="ai-provider-grid" orientation={Gtk.Orientation.VERTICAL} spacing={10}>
-                            {providers.map((provider) => (
-                                <button
-                                    class="ai-provider"
-                                    tooltipText={`Open ${provider.name}`}
-                                    onClicked={() => openChat(provider.url)}>
-                                    <box spacing={12}>
-                                        <label class="ai-provider-badge" label={provider.badge} />
-                                        <box orientation={Gtk.Orientation.VERTICAL} spacing={2} hexpand>
-                                            <label
-                                                class="ai-provider-name"
-                                                label={provider.name}
-                                                halign={Gtk.Align.START} />
-                                        </box>
-                                        <label class="ai-provider-open" label="open" />
-                                    </box>
-                                </button>
-                            ))}
-                        </box>
-
-                        <box class="ai-custom-url" spacing={8}>
-                            <entry
-                                hexpand
-                                placeholder_text="Custom URL, e.g. chat.mistral.ai"
-                                $={(self) => {
-                                    self.connect("changed", () => {
-                                        customUrl = self.text
-                                    })
-                                }}
-                                onActivate={(self) => openChat(self.text)} />
-                            <button
-                                class="ai-custom-open"
-                                onClicked={() => openChat(customUrl)}>
-                                <label label="Open" />
-                            </button>
-                        </box>
-                    </box>
-
-                    <box $type="overlay" valign={Gtk.Align.START} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => picker, "n", MIN_PICKER_WIDTH, MIN_PICKER_HEIGHT)} />
-                    <box $type="overlay" valign={Gtk.Align.END} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => picker, "s", MIN_PICKER_WIDTH, MIN_PICKER_HEIGHT)} />
-                    <box $type="overlay" halign={Gtk.Align.START} widthRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => picker, "w", MIN_PICKER_WIDTH, MIN_PICKER_HEIGHT)} />
-                    <box $type="overlay" halign={Gtk.Align.END} widthRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => picker, "e", MIN_PICKER_WIDTH, MIN_PICKER_HEIGHT)} />
-
-                    <box $type="overlay" halign={Gtk.Align.START} valign={Gtk.Align.START} widthRequest={15} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => picker, "nw", MIN_PICKER_WIDTH, MIN_PICKER_HEIGHT)} />
-                    <box $type="overlay" halign={Gtk.Align.END} valign={Gtk.Align.START} widthRequest={15} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => picker, "ne", MIN_PICKER_WIDTH, MIN_PICKER_HEIGHT)} />
-                    <box $type="overlay" halign={Gtk.Align.START} valign={Gtk.Align.END} widthRequest={15} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => picker, "sw", MIN_PICKER_WIDTH, MIN_PICKER_HEIGHT)} />
-                    <box $type="overlay" halign={Gtk.Align.END} valign={Gtk.Align.END} widthRequest={15} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => picker, "se", MIN_PICKER_WIDTH, MIN_PICKER_HEIGHT)} />
-
-                </overlay>
-
-                <overlay
-                    $type="overlay"
-                    halign={Gtk.Align.START}
-                    valign={Gtk.Align.START}
-                    marginStart={panelMarginStart}
-                    marginTop={panelMarginTop}
-                    visible={false}
-                    $={(self) => {
                         browser = self
+                        self.set_size_request(DEFAULT_WIDTH, DEFAULT_HEIGHT)
                         trackPanel(self)
                     }}>
-                    <box class="ai-chat-browser" orientation={Gtk.Orientation.VERTICAL} spacing={10} css="margin: 15px;" $={(self) => attachMoveController(self, () => browser)}>
+                    <box class="ai-chat-browser" orientation={Gtk.Orientation.VERTICAL} spacing={10} css="margin: 10px;" $={(self) => attachMoveController(self, () => browser)}>
                         <box class="ai-browser-toolbar ai-drag-handle" spacing={8}>
                             <button
                                 class="ai-browser-control"
                                 tooltipText="Back"
                                 $={(self) => backButton = self}
                                 onClicked={goBack}>
-                                <label label="<" />
+                                <image iconName="go-previous-symbolic" />
                             </button>
                             <button
                                 class="ai-browser-control"
                                 tooltipText="Choose another chatbot"
-                                onClicked={showPicker}>
-                                <label label="AI" />
+                                onClicked={toggleSidebar}>
+                                <image iconName="view-list-symbolic" />
                             </button>
                             <label
                                 class="ai-browser-address"
-                                label=""
+                                label={config.lastSelected}
                                 hexpand
-                                widthChars={10}
-                                maxWidthChars={5}
                                 ellipsize={3}
                                 halign={Gtk.Align.START}
                                 $={(self) => address = self} />
@@ -591,33 +496,78 @@ export default function ChatWindow() {
                                 class="ai-browser-control"
                                 tooltipText="Reload"
                                 onClicked={() => webView.reload()}>
-                                <label label="reload" />
-                            </button>
-                            <button
-                                class="ai-chat-close"
-                                tooltipText="Close"
-                                onClicked={() => app.get_window(WINDOW_NAME)?.hide()}>
-                                <label label="x" />
+                                <image iconName="view-refresh-symbolic" />
                             </button>
                         </box>
+
+                        {/* Browser Content with Sidebar overlay */}
                         <overlay hexpand vexpand>
-                            <box hexpand vexpand />
-                            <Gtk.ScrolledWindow $type="overlay" class="ai-browser-content" hexpand vexpand>
+                            <Gtk.ScrolledWindow class="ai-browser-content" hexpand vexpand minContentWidth={100} minContentHeight={100}>
                                 {webView}
                             </Gtk.ScrolledWindow>
+
+                            {/* Sidebar overlays the browser */}
+                            <box $type="overlay" class="ai-sidebar" orientation={Gtk.Orientation.VERTICAL} spacing={10} visible={false} widthRequest={250} halign={Gtk.Align.START} valign={Gtk.Align.FILL} $={(self) => { sidebar = self; }}>
+                                <label class="ai-chat-title" label="Chatbots" halign={Gtk.Align.START} />
+
+                                <Gtk.ScrolledWindow hexpand vexpand>
+                                    <box class="ai-provider-grid" orientation={Gtk.Orientation.VERTICAL} spacing={6}>
+                                        {(createComputed(() => providers().map((provider, index) => {
+                                            const faviconPath = getFaviconPath(provider.url)
+                                            const badge = faviconPath
+                                                ? <image class="ai-provider-badge" file={faviconPath} pixelSize={32} />
+                                                : <label class="ai-provider-badge" label={provider.badge} />
+                                            return (
+                                                <box spacing={8}>
+                                                    <button
+                                                        class="ai-provider"
+                                                        hexpand
+                                                        tooltipText={`Open ${provider.name}`}
+                                                        onClicked={() => openChat(provider.url)}>
+                                                        <box spacing={12}>
+                                                            {badge}
+                                                            <label class="ai-provider-name" label={provider.name} halign={Gtk.Align.START} hexpand />
+                                                        </box>
+                                                    </button>
+                                                    <button
+                                                        class="ai-provider-remove"
+                                                        tooltipText="Remove"
+                                                        onClicked={() => removeProvider(index)}>
+                                                        <image iconName="user-trash-symbolic" />
+                                                    </button>
+                                                </box>
+                                            )
+                                        })) as unknown as any)}
+                                    </box>
+                                </Gtk.ScrolledWindow>
+
+                                <box class="ai-custom-url" orientation={Gtk.Orientation.VERTICAL} spacing={6}>
+                                    <label class="ai-provider-name" label="Add New AI" halign={Gtk.Align.START} />
+                                    <entry placeholder_text="Name" $={(self) => addNameEntry = self} />
+                                    <entry placeholder_text="URL" $={(self) => addUrlEntry = self} />
+                                    <button
+                                        class="ai-custom-open"
+                                        onClicked={() => {
+                                            addProvider(addNameEntry.text, addUrlEntry.text)
+                                            addNameEntry.text = ""
+                                            addUrlEntry.text = ""
+                                        }}>
+                                        <image iconName="list-add-symbolic" />
+                                    </button>
+                                </box>
+                            </box>
                         </overlay>
                     </box>
 
-                    <box $type="overlay" valign={Gtk.Align.START} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "n", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
-                    <box $type="overlay" valign={Gtk.Align.END} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "s", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
-                    <box $type="overlay" halign={Gtk.Align.START} widthRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "w", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
-                    <box $type="overlay" halign={Gtk.Align.END} widthRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "e", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
+                    <box $type="overlay" valign={Gtk.Align.START} heightRequest={RESIZE_BORDER} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "n", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
+                    <box $type="overlay" valign={Gtk.Align.END} heightRequest={RESIZE_BORDER} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "s", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
+                    <box $type="overlay" halign={Gtk.Align.START} widthRequest={RESIZE_BORDER} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "w", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
+                    <box $type="overlay" halign={Gtk.Align.END} widthRequest={RESIZE_BORDER} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "e", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
 
-                    <box $type="overlay" halign={Gtk.Align.START} valign={Gtk.Align.START} widthRequest={15} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "nw", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
-                    <box $type="overlay" halign={Gtk.Align.END} valign={Gtk.Align.START} widthRequest={15} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "ne", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
-                    <box $type="overlay" halign={Gtk.Align.START} valign={Gtk.Align.END} widthRequest={15} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "sw", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
-                    <box $type="overlay" halign={Gtk.Align.END} valign={Gtk.Align.END} widthRequest={15} heightRequest={15} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "se", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
-
+                    <box $type="overlay" halign={Gtk.Align.START} valign={Gtk.Align.START} widthRequest={RESIZE_BORDER} heightRequest={RESIZE_BORDER} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "nw", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
+                    <box $type="overlay" halign={Gtk.Align.END} valign={Gtk.Align.START} widthRequest={RESIZE_BORDER} heightRequest={RESIZE_BORDER} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "ne", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
+                    <box $type="overlay" halign={Gtk.Align.START} valign={Gtk.Align.END} widthRequest={RESIZE_BORDER} heightRequest={RESIZE_BORDER} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "sw", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
+                    <box $type="overlay" halign={Gtk.Align.END} valign={Gtk.Align.END} widthRequest={RESIZE_BORDER} heightRequest={RESIZE_BORDER} css="background: transparent;" $={(self) => attachResizeHandle(self, () => browser, "se", MIN_BROWSER_WIDTH, MIN_BROWSER_HEIGHT)} />
                 </overlay>
             </overlay>
         </window>

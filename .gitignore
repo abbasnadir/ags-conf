@@ -1,2 +1,7 @@
 node_modules/
 @girs/
+
+# AI Chat Widget Data
+webkit_data
+favicon_cache
+widget/AIChat/config.json

@@ -1,7 +1,23 @@
+@use "sass:color";
 // https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
 $fg-color: #{"@theme_fg_color"};
 $bg-color: #{"@theme_bg_color"};
 
+// === Accent palette ===
+$green-accent: #00e676;
+$green-dim: rgba(0, 230, 118, 0.6);
+$green-subtle: rgba(0, 230, 118, 0.12);
+$green-faint: rgba(0, 230, 118, 0.06);
+$surface-0: #0a0a0a;
+$surface-1: #111111;
+$surface-2: #1a1a1a;
+$surface-3: #222222;
+$surface-4: #2a2a2a;
+$text-primary: #e8e8e8;
+$text-secondary: #888888;
+$text-muted: #555555;
+$danger: #ff4444;
+$danger-dim: rgba(255, 68, 68, 0.15);
 
 window.batteryBar {
   background: transparent;
@@ -34,149 +50,165 @@ window.topBar {
 window.aiChat {
   background: transparent;
 
-  .ai-chat-panel {
-    min-width: 400px;
-    padding: 22px;
-    border: 1px solid rgba(164, 185, 255, 0.24);
-    border-radius: 18px;
-    background: rgba(16, 21, 32, 0.97);
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
-    transition: none;
-  }
-
-  .ai-resize-handle {
-    min-width: 16px;
-    min-height: 16px;
-    margin: 6px;
-    border-radius: 6px;
-    background: rgba(255, 255, 255, 0.18);
-  }
-
-  .ai-resize-handle:hover {
-    background: rgba(255, 255, 255, 0.28);
-  }
-
-  .ai-chat-title {
-    color: #f4f7ff;
-    font-size: 22px;
-    font-weight: 800;
-  }
-
-  .ai-chat-subtitle,
-  .ai-provider-hint,
-  .ai-chat-footer {
-    color: rgba(220, 228, 246, 0.62);
-  }
-
-  .ai-chat-command {
-    padding: 10px 12px;
-    border-radius: 9px;
-    color: #dce6ff;
-    font-family: monospace;
-    background: rgba(112, 143, 255, 0.12);
-  }
-
   .ai-chat-browser {
-    min-width: 400px;
-    min-height: 760px;
-    padding: 12px;
-    border: 1px solid rgba(164, 185, 255, 0.24);
-    border-radius: 18px;
-    background: rgba(0, 0, 0, 0.97);
-    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
-    transition: none;
+    min-width: 430px;
+    min-height: 430px;
+    padding: 10px;
+    border: 1px solid rgba(0, 230, 118, 0.15);
+    border-radius: 14px;
+    background: $surface-0;
+    box-shadow:
+      0 0 0 1px rgba(0, 230, 118, 0.08),
+      0 20px 60px rgba(0, 0, 0, 0.9),
+      0 0 40px rgba(0, 230, 118, 0.04);
+    transition: box-shadow 200ms ease;
   }
 
+  // === Toolbar ===
   .ai-browser-toolbar {
-    padding: 2px;
+    padding: 6px 4px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid $surface-3;
   }
 
   .ai-browser-address {
-    padding: 0 8px;
-    color: rgba(220, 228, 246, 0.7);
+    padding: 0 14px;
+    color: $text-secondary;
+    font-weight: 500;
+    font-size: 12px;
   }
 
   .ai-browser-control {
-    min-height: 30px;
-    padding: 0 10px;
+    min-width: 28px;
+    min-height: 28px;
+    padding: 0;
     border-radius: 8px;
-    color: rgba(234, 240, 255, 0.82);
-    background: rgba(255, 255, 255, 0.06);
+    color: $text-secondary;
+    background: transparent;
+    transition: all 150ms ease;
   }
 
+  .ai-browser-control:hover {
+    color: $green-accent;
+    background: $green-subtle;
+  }
+
+  // === Content area ===
   .ai-browser-content {
-    border-radius: 12px;
+    border-radius: 10px;
     background: #ffffff;
   }
 
+  // === Sidebar ===
+  .ai-sidebar {
+    background: $surface-1;
+    border-right: 1px solid $surface-3;
+    padding: 14px;
+    border-radius: 0;
+  }
+
+  // === Buttons ===
   button {
     border: 0;
-    color: #eaf0ff;
+    color: $text-secondary;
     background: transparent;
+    transition: all 150ms ease;
   }
 
   button:hover {
-    background: rgba(126, 156, 255, 0.14);
+    color: $text-primary;
+    background: $surface-3;
   }
 
-  .ai-chat-close {
-    min-width: 30px;
-    min-height: 30px;
-    border-radius: 999px;
-    color: rgba(234, 240, 255, 0.72);
-    background: rgba(255, 255, 255, 0.06);
-  }
-
+  // === Provider cards ===
   .ai-provider {
-    padding: 11px 12px;
-    border: 1px solid rgba(164, 185, 255, 0.12);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.035);
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: $surface-0;
+    transition: all 150ms ease;
+  }
+
+  .ai-provider:hover {
+    background: $surface-2;
   }
 
   .ai-provider-badge {
-    min-width: 32px;
-    min-height: 32px;
-    border-radius: 9px;
-    color: #dce6ff;
+    min-width: 48px;
+    min-height: 48px;
+    border-radius: 0;
+    color: $surface-0;
     font-weight: 800;
-    background: rgba(70, 199, 0, 0.2);
+    font-size: 18px;
+    background: transparent;
   }
 
   .ai-provider-name {
-    color: #eef3ff;
-    font-weight: 700;
+    color: $text-primary;
+    font-weight: 600;
+    font-size: 14px;
   }
 
-  .ai-provider-open {
-    color: rgba(168, 190, 255, 0.86);
+  .ai-provider-remove {
+    min-width: 28px;
+    min-height: 28px;
+    border-radius: 8px;
+    color: $text-muted;
+    background: transparent;
+    transition: all 150ms ease;
   }
 
+  .ai-provider-remove:hover {
+    color: $danger;
+    background: $danger-dim;
+  }
+
+  // === Add new AI section ===
   .ai-custom-url {
-    padding-top: 2px;
+    padding-top: 14px;
+    border-top: 1px solid $surface-3;
+    margin-top: 8px;
   }
 
   entry {
-    padding: 10px 12px;
-    border: 1px solid rgba(151, 21, 21, 0.2);
+    padding: 10px 14px;
+    border: 1px solid $surface-3;
     border-radius: 10px;
-    color: #eef3ff;
-    background: rgba(224, 165, 165, 0.055);
+    color: $text-primary;
+    background: $surface-2;
+    font-size: 13px;
+    transition: all 150ms ease;
   }
 
   entry:focus {
-    border-color: rgba(124, 157, 255, 0.68);
+    background: $surface-3;
+    border-color: $green-dim;
   }
 
   .ai-custom-open {
-    padding: 0 15px;
+    padding: 8px 16px;
     border-radius: 10px;
-    color: #f5f7ff;
+    color: $surface-0;
     font-weight: 700;
-    background: rgba(89, 125, 255, 0.72);
+    background: $green-accent;
+    min-height: 36px;
+    transition: all 150ms ease;
   }
 
   .ai-custom-open:hover {
-    background: rgba(112, 143, 255, 0.92);
+    background: color.adjust($green-accent, $lightness: 8%);
+  }
+
+  // === Title ===
+  .ai-chat-title {
+    color: $text-primary;
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 12px;
+  }
+
+  .ai-chat-subtitle,
+  .ai-chat-command {
+    color: $text-secondary;
   }
 }
