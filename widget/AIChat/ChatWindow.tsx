@@ -122,11 +122,11 @@ export default function ChatWindow() {
     let lastInputRegion = ""
     let isDragging = false
     let sidebar!: Gtk.Widget
+    let providerGrid!: Gtk.Box
     let regionUpdateQueued = false
 
     const [panelX, setPanelX] = createState(0)
     const [panelY, setPanelY] = createState(0)
-    const [providers, setProviders] = createState([...config.providers])
 
     const panelMarginStart = createComputed(() => Math.round(panelX()))
     const panelMarginTop = createComputed(() => Math.round(panelY()))
@@ -425,20 +425,59 @@ export default function ChatWindow() {
     }
 
     const removeProvider = (index: number) => {
-        const arr = [...providers()]
-        arr.splice(index, 1)
-        setProviders(arr)
-        config.providers = arr
+        config.providers.splice(index, 1)
         saveConfig()
+        renderProviders()
     }
 
     const addProvider = (name: string, url: string) => {
         const cleanUrl = normalizeUrl(url)
         if (!name || !cleanUrl) return
-        const arr = [...providers(), { name, badge: name.charAt(0).toUpperCase(), url: cleanUrl }]
-        setProviders(arr)
-        config.providers = arr
+        config.providers.push({ name, badge: name.charAt(0).toUpperCase(), url: cleanUrl })
         saveConfig()
+        renderProviders()
+    }
+
+    const renderProviders = () => {
+        if (!providerGrid) return
+        let child = providerGrid.get_first_child()
+        while (child) {
+            const next = child.get_next_sibling()
+            providerGrid.remove(child)
+            child = next
+        }
+
+        config.providers.forEach((provider, index) => {
+            const faviconPath = getFaviconPath(provider.url)
+            const row = new Gtk.Box({ spacing: 8 })
+            
+            const btn = new Gtk.Button({ cssClasses: ["ai-provider"], hexpand: true, tooltipText: `Open ${provider.name}` })
+            btn.connect("clicked", () => openChat(provider.url))
+            
+            const btnBox = new Gtk.Box({ spacing: 12 })
+            btn.set_child(btnBox)
+            
+            if (faviconPath) {
+                const img = new Gtk.Image({ cssClasses: ["ai-provider-badge"], file: faviconPath, pixelSize: 32 })
+                btnBox.append(img)
+            } else {
+                const lbl = new Gtk.Label({ cssClasses: ["ai-provider-badge"], label: provider.badge })
+                btnBox.append(lbl)
+            }
+            
+            const nameLbl = new Gtk.Label({ cssClasses: ["ai-provider-name"], label: provider.name, halign: Gtk.Align.START, hexpand: true })
+            btnBox.append(nameLbl)
+            
+            const removeBtn = new Gtk.Button({ cssClasses: ["ai-provider-remove"], tooltipText: "Remove" })
+            removeBtn.connect("clicked", () => removeProvider(index))
+            const removeImg = new Gtk.Image({ iconName: "user-trash-symbolic" })
+            removeBtn.set_child(removeImg)
+            
+            row.append(btn)
+            row.append(removeBtn)
+            
+            providerGrid.append(row)
+        })
     }
 
 
@@ -511,34 +550,7 @@ export default function ChatWindow() {
                                 <label class="ai-chat-title" label="Chatbots" halign={Gtk.Align.START} />
 
                                 <Gtk.ScrolledWindow hexpand vexpand>
-                                    <box class="ai-provider-grid" orientation={Gtk.Orientation.VERTICAL} spacing={6}>
-                                        {(createComputed(() => providers().map((provider, index) => {
-                                            const faviconPath = getFaviconPath(provider.url)
-                                            const badge = faviconPath
-                                                ? <image class="ai-provider-badge" file={faviconPath} pixelSize={32} />
-                                                : <label class="ai-provider-badge" label={provider.badge} />
-                                            return (
-                                                <box spacing={8}>
-                                                    <button
-                                                        class="ai-provider"
-                                                        hexpand
-                                                        tooltipText={`Open ${provider.name}`}
-                                                        onClicked={() => openChat(provider.url)}>
-                                                        <box spacing={12}>
-                                                            {badge}
-                                                            <label class="ai-provider-name" label={provider.name} halign={Gtk.Align.START} hexpand />
-                                                        </box>
-                                                    </button>
-                                                    <button
-                                                        class="ai-provider-remove"
-                                                        tooltipText="Remove"
-                                                        onClicked={() => removeProvider(index)}>
-                                                        <image iconName="user-trash-symbolic" />
-                                                    </button>
-                                                </box>
-                                            )
-                                        })) as unknown as any)}
-                                    </box>
+                                    <box class="ai-provider-grid" orientation={Gtk.Orientation.VERTICAL} spacing={6} $={(self) => { providerGrid = self; renderProviders(); }} />
                                 </Gtk.ScrolledWindow>
 
                                 <box class="ai-custom-url" orientation={Gtk.Orientation.VERTICAL} spacing={6}>
