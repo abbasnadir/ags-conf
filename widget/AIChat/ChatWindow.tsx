@@ -10,8 +10,8 @@ GLib.setenv("WEBKIT_DISABLE_DMABUF_RENDERER", "1", true)
 // Fix for WebKitGTK hanging on ChatGPT when typing long texts
 GLib.setenv("WEBKIT_DISABLE_COMPOSITING_MODE", "1", true)
 
-const WebKit = await import("gi://WebKit?version=6.0")
-    .then(({ default: WebKit }) => WebKit)
+const WebKitModule = await import("gi://WebKit?version=6.0")
+    .then(({ default: W }) => W)
     .catch(() => null)
 
 const WINDOW_NAME = "aiChat"
@@ -109,7 +109,7 @@ function addEscapeHandler(window: Astal.Window) {
 }
 
 export default function ChatWindow() {
-    if (!WebKit) {
+    if (!WebKitModule) {
         console.error("WebKit is missing. Please install webkitgtk-6.0")
         return <window name={WINDOW_NAME} visible={false} />
     }
@@ -135,18 +135,18 @@ export default function ChatWindow() {
     const cacheDir = `${GLib.get_user_cache_dir()}/ags-ai-chat`
 
     // In WebKit 6.0, NetworkSession replaces WebsiteDataManager and WebContext.
-    const session = (WebKit as any).NetworkSession.new(dataDir, cacheDir)
+    const session = (WebKitModule as any).NetworkSession.new(dataDir, cacheDir)
 
     const cookieManager = session.get_cookie_manager()
-    cookieManager.set_persistent_storage(`${dataDir}/cookies.sqlite`, (WebKit as any).CookiePersistentStorage.SQLITE)
+    cookieManager.set_persistent_storage(`${dataDir}/cookies.sqlite`, (WebKitModule as any).CookiePersistentStorage.SQLITE)
 
     // Enable WebRTC for microphone/audio support and allow clipboard access
-    const settings = new (WebKit as any).Settings()
+    const settings = new (WebKitModule as any).Settings()
     settings.enable_webrtc = true
     settings.enable_developer_extras = true
     settings.javascript_can_access_clipboard = true
 
-    const webView = new WebKit.WebView({
+    const webView = new WebKitModule.WebView({
         network_session: session,
         settings: settings,
     } as any)
@@ -288,7 +288,7 @@ export default function ChatWindow() {
             if (!target) return false
             if (target instanceof Gtk.Button) return true
             if (target instanceof Gtk.Entry) return true
-            if (WebKit && target instanceof WebKit.WebView) return true
+            if (WebKitModule && target instanceof WebKitModule.WebView) return true
             if (target instanceof Gtk.ScrolledWindow) return true
             // Walk up the widget tree to check parent interactivity
             const parent = target.get_parent()
@@ -425,6 +425,18 @@ export default function ChatWindow() {
     }
 
     const removeProvider = (index: number) => {
+        const provider = config.providers[index]
+        if (provider) {
+            const faviconPath = getFaviconPath(provider.url)
+            if (faviconPath) {
+                try {
+                    const file = Gio.File.new_for_path(faviconPath)
+                    if (file.query_exists(null)) file.delete(null)
+                } catch (e) {
+                    console.error("Failed to delete favicon cache:", e)
+                }
+            }
+        }
         config.providers.splice(index, 1)
         saveConfig()
         renderProviders()
@@ -450,13 +462,13 @@ export default function ChatWindow() {
         config.providers.forEach((provider, index) => {
             const faviconPath = getFaviconPath(provider.url)
             const row = new Gtk.Box({ spacing: 8 })
-            
+
             const btn = new Gtk.Button({ cssClasses: ["ai-provider"], hexpand: true, tooltipText: `Open ${provider.name}` })
             btn.connect("clicked", () => openChat(provider.url))
-            
+
             const btnBox = new Gtk.Box({ spacing: 12 })
             btn.set_child(btnBox)
-            
+
             if (faviconPath) {
                 const img = new Gtk.Image({ cssClasses: ["ai-provider-badge"], file: faviconPath, pixelSize: 32 })
                 btnBox.append(img)
@@ -464,18 +476,18 @@ export default function ChatWindow() {
                 const lbl = new Gtk.Label({ cssClasses: ["ai-provider-badge"], label: provider.badge })
                 btnBox.append(lbl)
             }
-            
+
             const nameLbl = new Gtk.Label({ cssClasses: ["ai-provider-name"], label: provider.name, halign: Gtk.Align.START, hexpand: true })
             btnBox.append(nameLbl)
-            
+
             const removeBtn = new Gtk.Button({ cssClasses: ["ai-provider-remove"], tooltipText: "Remove" })
             removeBtn.connect("clicked", () => removeProvider(index))
             const removeImg = new Gtk.Image({ iconName: "user-trash-symbolic" })
             removeBtn.set_child(removeImg)
-            
+
             row.append(btn)
             row.append(removeBtn)
-            
+
             providerGrid.append(row)
         })
     }
