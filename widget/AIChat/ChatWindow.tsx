@@ -15,8 +15,8 @@ const WebKitModule = await import("gi://WebKit?version=6.0")
     .catch(() => null)
 
 const WINDOW_NAME = "aiChat"
-const CONFIG_PATH = GLib.get_home_dir() + "/.config/ags/widget/AIChat/config.json"
-const WEBKIT_DATA_DIR = GLib.get_home_dir() + "/.config/ags/widget/AIChat/webkit_data"
+const CONFIG_PATH = GLib.get_user_data_dir() + "/ags-ai-chat/config.json"
+const FAVICON_CACHE_DIR = GLib.get_user_cache_dir() + "/ags-ai-chat/favicons"
 
 const defaultProviders = [
     { name: "ChatGPT", badge: "G", url: "https://chatgpt.com" },
@@ -27,7 +27,9 @@ const defaultProviders = [
 
 let config = {
     providers: defaultProviders,
-    lastSelected: "https://chatgpt.com"
+    lastSelected: "https://chatgpt.com",
+    windowWidth: 450,
+    windowHeight: 550
 }
 
 function loadConfig() {
@@ -38,6 +40,8 @@ function loadConfig() {
             const data = JSON.parse(new TextDecoder("utf-8").decode(contents))
             if (data.providers) config.providers = data.providers
             if (data.lastSelected) config.lastSelected = data.lastSelected
+            if (data.windowWidth) config.windowWidth = data.windowWidth
+            if (data.windowHeight) config.windowHeight = data.windowHeight
         }
     } catch (e) {
         saveConfig()
@@ -66,7 +70,7 @@ const DEFAULT_WIDTH = 450
 const DEFAULT_HEIGHT = 550
 const RESIZE_BORDER = 14
 
-const FAVICON_CACHE_DIR = GLib.get_home_dir() + "/.config/ags/widget/AIChat/favicon_cache"
+
 
 // Ensure favicon cache dir exists
 try {
@@ -135,6 +139,8 @@ export default function ChatWindow() {
     const cacheDir = `${GLib.get_user_cache_dir()}/ags-ai-chat`
 
     // In WebKit 6.0, NetworkSession replaces WebsiteDataManager and WebContext.
+    // It automatically handles DOM storage, Service Workers, and persistent cache 
+    // when created with dataDir and cacheDir!
     const session = (WebKitModule as any).NetworkSession.new(dataDir, cacheDir)
 
     const cookieManager = session.get_cookie_manager()
@@ -145,6 +151,7 @@ export default function ChatWindow() {
     settings.enable_webrtc = true
     settings.enable_developer_extras = true
     settings.javascript_can_access_clipboard = true
+    settings.enable_page_cache = true
 
     const webView = new WebKitModule.WebView({
         network_session: session,
@@ -355,6 +362,12 @@ export default function ChatWindow() {
             isDragging = false
             lastInputRegion = ""
             updateInputRegion()
+            const panel = getPanel()
+            if (panel) {
+                config.windowWidth = panel.get_allocated_width()
+                config.windowHeight = panel.get_allocated_height()
+                saveConfig()
+            }
         }
         controller.connect("drag-end", endDrag)
         controller.connect("cancel", endDrag)
@@ -402,6 +415,15 @@ export default function ChatWindow() {
         windowRef = window
         addEscapeHandler(window)
         window.connect("realize", () => scheduleInputRegionUpdate())
+        
+        // Force webView to hide when window hides. This stops Wayland/WebKit 
+        // from rendering background animations, reducing idle CPU usage to 0!
+        window.connect("notify::visible", () => {
+            webView.visible = window.visible
+            if (window.visible) {
+                scheduleInputRegionUpdate()
+            }
+        })
     }
 
     const toggleSidebar = () => {
@@ -518,7 +540,7 @@ export default function ChatWindow() {
                     marginTop={panelMarginTop}
                     $={(self) => {
                         browser = self
-                        self.set_size_request(DEFAULT_WIDTH, DEFAULT_HEIGHT)
+                        self.set_size_request(config.windowWidth, config.windowHeight)
                         trackPanel(self)
                     }}>
                     <box class="ai-chat-browser" orientation={Gtk.Orientation.VERTICAL} spacing={10} css="margin: 10px;" $={(self) => attachMoveController(self, () => browser)}>
@@ -536,13 +558,17 @@ export default function ChatWindow() {
                                 onClicked={toggleSidebar}>
                                 <image iconName="view-list-symbolic" />
                             </button>
-                            <label
-                                class="ai-browser-address"
-                                label={config.lastSelected}
-                                hexpand
-                                ellipsize={3}
-                                halign={Gtk.Align.START}
-                                $={(self) => address = self} />
+                            <overlay hexpand>
+                                <box />
+                                <label
+                                    $type="overlay"
+                                    class="ai-browser-address"
+                                    label={config.lastSelected}
+                                    ellipsize={3}
+                                    widthChars={1}
+                                    halign={Gtk.Align.FILL}
+                                    $={(self) => address = self} />
+                            </overlay>
                             <button
                                 class="ai-browser-control"
                                 tooltipText="Reload"
@@ -553,7 +579,16 @@ export default function ChatWindow() {
 
                         {/* Browser Content with Sidebar overlay */}
                         <overlay hexpand vexpand>
-                            <Gtk.ScrolledWindow class="ai-browser-content" hexpand vexpand minContentWidth={100} minContentHeight={100}>
+                            <Gtk.ScrolledWindow 
+                                class="ai-browser-content" 
+                                hexpand 
+                                vexpand 
+                                minContentWidth={100} 
+                                minContentHeight={100}
+                                hscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
+                                vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
+                                propagateNaturalWidth={false}
+                                propagateNaturalHeight={false}>
                                 {webView}
                             </Gtk.ScrolledWindow>
 
