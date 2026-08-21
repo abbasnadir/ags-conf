@@ -5,10 +5,7 @@ import Cairo from "cairo"
 import GLib from "gi://GLib"
 import Gio from "gi://Gio"
 
-// Fix for Wayland Protocol error 71 (DMA-BUF renderer crash on file dialogs)
-GLib.setenv("WEBKIT_DISABLE_DMABUF_RENDERER", "1", true)
-// Fix for WebKitGTK hanging on ChatGPT when typing long texts
-GLib.setenv("WEBKIT_DISABLE_COMPOSITING_MODE", "1", true)
+
 
 const WebKitModule = await import("gi://WebKit?version=6.0")
     .then(({ default: W }) => W)
@@ -151,7 +148,10 @@ export default function ChatWindow() {
     settings.enable_webrtc = true
     settings.enable_developer_extras = true
     settings.javascript_can_access_clipboard = true
-    settings.enable_page_cache = true
+    
+    // Fake the User-Agent to a standard Safari browser. Cloudflare detects Chrome UA on WebKit 
+    // engines as a mismatch/bot and loops forever, but Safari perfectly matches WebKitGTK!
+    settings.user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15"
 
     const webView = new WebKitModule.WebView({
         network_session: session,
@@ -204,6 +204,8 @@ export default function ChatWindow() {
         address.label = webView.uri ?? ""
         backButton.sensitive = webView.can_go_back()
     }
+
+
 
     webView.connect("notify::uri", updateBrowserHeader)
     webView.connect("notify::can-go-back", updateBrowserHeader)
