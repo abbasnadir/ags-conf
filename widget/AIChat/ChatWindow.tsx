@@ -546,51 +546,58 @@ export default function ChatWindow() {
                         trackPanel(self)
                     }}>
                     <box class="ai-chat-browser" orientation={Gtk.Orientation.VERTICAL} spacing={10} css="margin: 10px;" $={(self) => attachMoveController(self, () => browser)}>
-                        <box orientation={Gtk.Orientation.VERTICAL} spacing={0}>
-                            <box class="ai-browser-toolbar ai-drag-handle" spacing={8}>
-                                <button
-                                    class="ai-browser-control"
-                                    tooltipText="Back"
-                                    $={(self) => backButton = self}
-                                    onClicked={goBack}>
-                                    <image iconName="go-previous-symbolic" />
-                                </button>
-                                <button
-                                    class="ai-browser-control"
-                                    tooltipText="Choose another chatbot"
-                                    onClicked={toggleSidebar}>
-                                    <image iconName="view-list-symbolic" />
-                                </button>
-                                <overlay hexpand>
-                                    <box />
+                        <box class="ai-browser-toolbar ai-drag-handle" spacing={8}>
+                            <button
+                                class="ai-browser-control"
+                                tooltipText="Back"
+                                $={(self) => backButton = self}
+                                onClicked={goBack}>
+                                <image iconName="go-previous-symbolic" />
+                            </button>
+                            <button
+                                class="ai-browser-control"
+                                tooltipText="Choose another chatbot"
+                                onClicked={toggleSidebar}>
+                                <image iconName="view-list-symbolic" />
+                            </button>
+                            <overlay hexpand>
+                                <box orientation={Gtk.Orientation.VERTICAL}>
                                     <label
-                                        $type="overlay"
                                         class="ai-browser-address"
                                         label={config.lastSelected}
                                         ellipsize={3}
                                         widthChars={1}
                                         halign={Gtk.Align.FILL}
                                         $={(self) => address = self} />
-                                </overlay>
-                                <button
-                                    class="ai-browser-control"
-                                    tooltipText="Reload"
-                                    onClicked={() => webView.reload()}>
-                                    <image iconName="view-refresh-symbolic" />
-                                </button>
-                            </box>
-                            <Gtk.ProgressBar
-                                class="ai-laser-progress"
-                                visible={false}
-                                $={(self) => {
-                                    webView.connect("notify::estimated-load-progress", () => {
-                                        self.set_fraction(webView.estimated_load_progress)
-                                    })
-                                    webView.connect("notify::is-loading", () => {
-                                        self.set_visible(webView.is_loading)
-                                    })
-                                }}
-                            />
+                                    <box hexpand $={(container) => {
+                                        const bar = new Gtk.Box()
+                                        bar.add_css_class("ai-laser-progress")
+                                        bar.halign = Gtk.Align.CENTER
+                                        bar.valign = Gtk.Align.START
+                                        container.append(bar)
+                                        
+                                        const updateSize = () => {
+                                            if (!webView.is_loading) return
+                                            const p = webView.estimated_load_progress
+                                            const w = container.get_allocated_width()
+                                            bar.set_size_request(Math.round(w * p), 2)
+                                        }
+                                        
+                                        webView.connect("notify::estimated-load-progress", updateSize)
+                                        
+                                        webView.connect("notify::is-loading", () => {
+                                            bar.visible = webView.is_loading
+                                            if (webView.is_loading) updateSize()
+                                        })
+                                    }} />
+                                </box>
+                            </overlay>
+                            <button
+                                class="ai-browser-control"
+                                tooltipText="Reload"
+                                onClicked={() => webView.reload()}>
+                                <image iconName="view-refresh-symbolic" />
+                            </button>
                         </box>
 
                         {/* Browser Content with Sidebar overlay */}
