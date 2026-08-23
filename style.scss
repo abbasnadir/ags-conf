@@ -212,3 +212,225 @@ window.aiChat {
     color: $text-secondary;
   }
 }
+// TopBar Base Styling
+window.topBar {
+  background-color: $surface-1;
+  border-top: 1px solid $surface-3;
+}
+
+.bar-layout {
+  padding: 4px 12px;
+}
+
+.workspace-btn, .clock-btn, .network-btn, .bluetooth-btn, .media-btn, .app-btn {
+  background: transparent;
+  color: $text-secondary;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.workspace-btn:hover, .clock-btn:hover, .network-btn:hover, .bluetooth-btn:hover, .media-btn:hover, .app-btn:hover {
+  background: $surface-3;
+  color: $text-primary;
+}
+
+.workspace-btn.active {
+  background: $surface-3;
+  color: $green-accent;
+}
+
+.active-window {
+  color: $text-primary;
+  font-weight: bold;
+}
+
+window.calendar {
+  background-color: $surface-1;
+  border: 1px solid $surface-3;
+  border-radius: 8px;
+}
+
+.calendar-window {
+  padding: 8px;
+  background-color: transparent;
+  color: $text-primary;
+}
+
+.component-box {
+  padding: 0px 8px;
+  background: $surface-2;
+  border-radius: 6px;
+}
+
+.network-window {
+  padding: 12px;
+  background-color: $surface-1;
+  border: 1px solid $surface-3;
+  border-radius: 8px;
+  color: $text-primary;
+}
+
+.network-title {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 8px;
+}
+
+.ap-btn {
+  background: transparent;
+  color: $text-secondary;
+  border: none;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.ap-btn:hover {
+  background: $surface-3;
+  color: $text-primary;
+}
+
+.transparent-backdrop {
+  background: rgba(0, 0, 0, 0.4);
+  border: none;
+}
+
+.ap-container {
+  margin-bottom: 4px;
+}
+
+.ap-password-box {
+  padding: 8px;
+  background: $surface-2;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.connect-btn, .advanced-settings-btn {
+  background: $surface-3;
+  color: $text-primary;
+  border: none;
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.connect-btn:hover, .advanced-settings-btn:hover {
+  background: $green-accent;
+  color: $surface-0;
+}
+
+.refresh-btn {
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 4px;
+}
+.refresh-btn:hover {
+  background: $surface-3;
+}
+
+.error-msg {
+  color: $danger;
+  font-size: 0.9em;
+  margin-top: 4px;
+}
+
+.app-count {
+  font-size: 0.8em;
+  font-weight: bold;
+  color: $green-accent;
+  padding: 0 4px;
+}
+
+.workspace-rect {
+  padding: 0;
+  border-radius: 6px;
+}
+
+.workspace-minimap {
+  background: $surface-2;
+  border: 1px solid $surface-3;
+  border-radius: 4px;
+}
+
+.workspace-btn.active .workspace-minimap {
+  border-color: $green-accent;
+  background: $surface-3;
+}
+
+.minimap-client {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.workspace-btn.special.active .workspace-minimap {
+  border-color: #33ccff;
+  background: rgba(51, 204, 255, 0.15);
+}
+
+.workspace-btn.special .workspace-minimap {
+  border-style: dashed;
+}
+
+.bluetooth-window {
+  padding: 12px;
+  background-color: $surface-1;
+  border: 1px solid $surface-3;
+  border-radius: 8px;
+  color: $text-primary;
+}
+
+.bluetooth-title {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.bluetooth-device-item {
+  padding: 6px;
+  border-radius: 4px;
+}
+.bluetooth-device-item:hover {
+  background-color: $surface-2;
+}
+.bluetooth-connect-btn {
+  padding: 4px 12px;
+  border-radius: 4px;
+  background-color: $surface-3;
+}
+.bluetooth-connect-btn:hover {
+  background-color: $surface-4;
+}
+
+.bluetooth-scan-btn {
+  padding: 4px;
+  border-radius: 50%;
+  background-color: transparent;
+}
+.bluetooth-scan-btn:hover {
+  background-color: $surface-3;
+}
+
+progressbar.ai-laser-progress {
+  min-height: 2px;
+  margin-top: -6px; /* offset the toolbar bottom margin if needed */
+  margin-bottom: 4px;
+}
+
+progressbar.ai-laser-progress trough {
+  background: transparent;
+  min-height: 2px;
+}
+
+progressbar.ai-laser-progress progress {
+  background: $green-accent;
+  min-height: 2px;
+  border-radius: 2px;
+  box-shadow: 0 0 10px 2px $green-accent, 0 0 5px 0px $green-accent, 0 0 20px 2px rgba(0, 230, 118, 0.8);
+  /* Laser particles effect using background images/gradients */
+  background-image: radial-gradient(circle at right, #ffffff 0%, transparent 100%),
+                    radial-gradient(circle at right, $green-accent 0%, transparent 80%);
+  background-size: 20px 100%, 40px 100%;
+  background-repeat: no-repeat;
+  background-position: right center, right center;
+}
