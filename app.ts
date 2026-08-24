@@ -6,6 +6,8 @@ import ChatWindow from "./widget/AIChat/ChatWindow"
 import CalendarWindow from "./widget/TopBar/Calendar"
 import NetworkWindow from "./widget/TopBar/Network"
 import BluetoothWindow from "./widget/TopBar/Bluetooth"
+import NotificationCenter from "./widget/TopBar/NotificationCenter"
+import PowerMenuWindow from "./widget/TopBar/PowerMenu"
 
 app.start({
   css: style,
@@ -16,5 +18,7 @@ app.start({
     CalendarWindow()
     NetworkWindow()
     BluetoothWindow()
+    NotificationCenter()
+    PowerMenuWindow()
   },
 })

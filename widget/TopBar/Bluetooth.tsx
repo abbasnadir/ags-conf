@@ -1,5 +1,7 @@
+import GLib from "gi://GLib"
 import app from "ags/gtk4/app"
 import { Astal, Gtk } from "ags/gtk4"
+import Flames from "./Flames"
 import { createBinding, createComputed, With } from "gnim"
 
 let AstalBluetooth: any = null
@@ -9,6 +11,7 @@ function DeviceItem({ device }: { device: any }) {
     const connected = createBinding(device, "connected")
     const connecting = createBinding(device, "connecting")
     const paired = createBinding(device, "paired")
+    const trusted = createBinding(device, "trusted")
     
     const statusLabel = createComputed(() => {
         const conn = connected()
@@ -25,20 +28,48 @@ function DeviceItem({ device }: { device: any }) {
             <image iconName={device.icon || "bluetooth-active-symbolic"} pixelSize={24} />
             <box orientation={Gtk.Orientation.VERTICAL} hexpand>
                 <label label={device.name || device.address} halign={Gtk.Align.START} />
-                <label label={statusLabel} cssClasses={["dim"]} halign={Gtk.Align.START} />
+                <label label={statusLabel} cssClasses={["dim", "small-text"]} halign={Gtk.Align.START} />
             </box>
-            <button 
-                cssClasses={["bluetooth-connect-btn"]}
-                onClicked={() => {
-                    if (device.connected) {
-                        device.disconnect_device(() => {})
-                    } else {
-                        device.connect_device(() => {})
-                    }
-                }}
-            >
-                <label label={createComputed(() => connected() ? "Disconnect" : "Connect")} />
-            </button>
+            <box spacing={4}>
+                <With value={paired}>
+                    {(prd: boolean) => {
+                        if (!prd) {
+                            return (
+                                <button 
+                                    cssClasses={["bluetooth-connect-btn"]}
+                                    onClicked={() => device.pair(() => {})}
+                                >
+                                    <label label="Pair" />
+                                </button>
+                            )
+                        } else {
+                            return (
+                                <box spacing={4}>
+                                    <With value={trusted}>
+                                        {(trst: boolean) => !trst ? (
+                                            <button 
+                                                cssClasses={["bluetooth-connect-btn"]}
+                                                onClicked={() => device.set_trusted(true)}
+                                            >
+                                                <image iconName="security-high-symbolic" tooltipText="Trust Device" />
+                                            </button>
+                                        ) : <box />}
+                                    </With>
+                                    <button 
+                                        cssClasses={["bluetooth-connect-btn"]}
+                                        onClicked={() => {
+                                            if (device.connected) device.disconnect_device(() => {})
+                                            else device.connect_device(() => {})
+                                        }}
+                                    >
+                                        <label label={createComputed(() => connected() ? "Disconnect" : "Connect")} />
+                                    </button>
+                                </box>
+                            )
+                        }
+                    }}
+                </With>
+            </box>
         </box>
     )
 }
@@ -53,6 +84,7 @@ export default function BluetoothWindow() {
     return (
         <window
             name="bluetooth"
+            cssClasses={["popup-window"]}
             application={app}
             visible={false}
             layer={Astal.Layer.OVERLAY}
@@ -68,102 +100,112 @@ export default function BluetoothWindow() {
                 })
             }}
         >
-            <box 
-                cssClasses={["bluetooth-window"]} 
-                orientation={Gtk.Orientation.VERTICAL} 
-                spacing={8}
-            >
-                <box halign={Gtk.Align.FILL} spacing={8}>
-                    <label cssClasses={["bluetooth-title"]} label="Bluetooth Devices" hexpand halign={Gtk.Align.START} />
-                    
-                    <With value={adapterBinding}>
-                        {(adapter: any) => {
-                            if (!adapter) return <box />
-                            const discovering = createBinding(adapter, "discovering")
-                            return (
-                                <box>
-                                    <With value={discovering}>
-                                        {(disc: boolean) => (
-                                            <button 
-                                                cssClasses={["bluetooth-scan-btn"]}
-                                                onClicked={() => {
-                                                    if (disc) adapter.stop_discovery()
-                                                    else adapter.start_discovery()
-                                                }}
-                                                tooltipText={disc ? "Stop Scanning" : "Scan for Devices"}
-                                            >
-                                                <image iconName={disc ? "media-playback-pause-symbolic" : "view-refresh-symbolic"} />
-                                            </button>
-                                        )}
-                                    </With>
-                                </box>
-                            )
-                        }}
-                    </With>
-
-                    <With value={isPowered}>
-                        {(p: boolean) => (
-                            <switch 
-                                active={p} 
-                                onNotifyActive={(self) => {
-                                    if (bt.get_adapter() && self.active !== bt.get_is_powered()) {
-                                        bt.toggle()
-                                    }
-                                }} 
-                            />
-                        )}
-                    </With>
-                </box>
-
-                <Gtk.Separator />
-
-                <Gtk.ScrolledWindow
-                    hscrollbarPolicy={Gtk.PolicyType.NEVER}
-                    vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
-                    maxContentHeight={300}
-                    minContentHeight={150}
-                    minContentWidth={250}
-                >
-                    <With value={isPowered}>
-                        {(powered: boolean) => {
-                            if (!powered) {
-                                return (
-                                    <box halign={Gtk.Align.CENTER} valign={Gtk.Align.CENTER} vexpand>
-                                        <label label="Bluetooth is turned off" cssClasses={["dim"]} />
-                                    </box>
-                                )
+            <box cssClasses={["bluetooth-window"]}>
+                <overlay hexpand vexpand>
+                    <Flames />
+                    <box $type="overlay" hexpand vexpand orientation={Gtk.Orientation.VERTICAL} spacing={12}
+                    $={(self: any) => {
+                        GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                            const parent = self.get_parent();
+                            if (parent && parent.set_measure_overlay) {
+                                parent.set_measure_overlay(self, true);
                             }
+                            return GLib.SOURCE_REMOVE;
+                        });
+                    }}>
+                        <box halign={Gtk.Align.FILL} spacing={8}>
+                            <label cssClasses={["bluetooth-title"]} label="Bluetooth Devices" hexpand halign={Gtk.Align.START} />
                             
-                            return (
-                                <box hexpand vexpand>
-                                    <With value={devices}>
-                                        {(devs: any[]) => {
-                                        if (!devs || devs.length === 0) {
-                                            return (
-                                                <box halign={Gtk.Align.CENTER} valign={Gtk.Align.CENTER} vexpand>
-                                                    <label label="No devices found" cssClasses={["dim"]} />
-                                                </box>
-                                            )
-                                        }
-                                        
-                                        const sorted = [...devs].sort((a, b) => {
-                                            if (a.connected !== b.connected) return a.connected ? -1 : 1
-                                            if (a.paired !== b.paired) return a.paired ? -1 : 1
-                                            return 0
-                                        })
-                                        
+                            <With value={adapterBinding}>
+                                {(adapter: any) => {
+                                    if (!adapter) return <box />
+                                    const discovering = createBinding(adapter, "discovering")
+                                    return (
+                                        <box>
+                                            <With value={discovering}>
+                                                {(disc: boolean) => (
+                                                    <button 
+                                                        cssClasses={["bluetooth-scan-btn"]}
+                                                        onClicked={() => {
+                                                            if (disc) adapter.stop_discovery()
+                                                            else adapter.start_discovery()
+                                                        }}
+                                                        tooltipText={disc ? "Stop Scanning" : "Scan for Devices"}
+                                                    >
+                                                        <image iconName={disc ? "media-playback-pause-symbolic" : "view-refresh-symbolic"} />
+                                                    </button>
+                                                )}
+                                            </With>
+                                        </box>
+                                    )
+                                }}
+                            </With>
+
+                            <With value={isPowered}>
+                                {(p: boolean) => (
+                                    <switch 
+                                        active={p} 
+                                        onNotifyActive={(self) => {
+                                            if (bt.get_adapter() && self.active !== bt.get_is_powered()) {
+                                                bt.toggle()
+                                            }
+                                        }} 
+                                    />
+                                )}
+                            </With>
+                        </box>
+
+                        <Gtk.Separator />
+
+                        <Gtk.ScrolledWindow
+                            hscrollbarPolicy={Gtk.PolicyType.NEVER}
+                            vscrollbarPolicy={Gtk.PolicyType.AUTOMATIC}
+                            maxContentHeight={300}
+                            minContentHeight={150}
+                            minContentWidth={350}
+                        >
+                            <With value={isPowered}>
+                                {(powered: boolean) => {
+                                    if (!powered) {
                                         return (
-                                            <box orientation={Gtk.Orientation.VERTICAL} spacing={4}>
-                                                {sorted.map(d => <DeviceItem device={d} />)}
+                                            <box halign={Gtk.Align.CENTER} valign={Gtk.Align.CENTER} vexpand>
+                                                <label label="Bluetooth is turned off" cssClasses={["dim"]} />
                                             </box>
                                         )
-                                    }}
-                                    </With>
-                                </box>
-                            )
-                        }}
-                    </With>
-                </Gtk.ScrolledWindow>
+                                    }
+                                    
+                                    return (
+                                        <box hexpand vexpand>
+                                            <With value={devices}>
+                                                {(devs: any[]) => {
+                                                if (!devs || devs.length === 0) {
+                                                    return (
+                                                        <box halign={Gtk.Align.CENTER} valign={Gtk.Align.CENTER} vexpand>
+                                                            <label label="No devices found" cssClasses={["dim"]} />
+                                                        </box>
+                                                    )
+                                                }
+                                                
+                                                const sorted = [...devs].sort((a, b) => {
+                                                    if (a.connected !== b.connected) return a.connected ? -1 : 1
+                                                    if (a.paired !== b.paired) return a.paired ? -1 : 1
+                                                    return 0
+                                                })
+                                                
+                                                return (
+                                                    <box orientation={Gtk.Orientation.VERTICAL} spacing={4}>
+                                                        {sorted.map(d => <DeviceItem device={d} />)}
+                                                    </box>
+                                                )
+                                            }}
+                                            </With>
+                                        </box>
+                                    )
+                                }}
+                            </With>
+                        </Gtk.ScrolledWindow>
+                    </box>
+                </overlay>
             </box>
         </window>
     )

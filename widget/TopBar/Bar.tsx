@@ -1,3 +1,4 @@
+import ParticleOrb from "./ParticleOrb"
 import app from "ags/gtk4/app"
 import { Astal, Gtk, Gdk } from "ags/gtk4"
 import { createState, createBinding, createEffect, createComputed, onCleanup, For, With } from "gnim"
@@ -59,21 +60,41 @@ function Workspaces() {
         }
     })
 
+    const forceUpdateGeometry = () => {
+        hypr.sync_clients((_, res) => {
+            try {
+                hypr.sync_clients_finish(res)
+                for (const c of hypr.get_clients()) {
+                    c.notify("width")
+                    c.notify("height")
+                    c.notify("x")
+                    c.notify("y")
+                }
+            } catch (e) {
+                console.error(e)
+            }
+        })
+    }
+
+    const animateUpdate = () => {
+        let count = 0
+        // Sync at 50, 150, 250, 350, 450ms to catch the animation frames
+        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+            forceUpdateGeometry()
+            count++
+            if (count >= 5) return GLib.SOURCE_REMOVE
+            return GLib.SOURCE_CONTINUE
+        })
+    }
+
     hypr.connect("client-added", () => {
         hypr.notify("clients")
+        animateUpdate()
     })
+    
     hypr.connect("client-removed", () => {
         hypr.notify("clients")
-        // Second pass after auto-tiling finishes resizing remaining windows
-        GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {
-            for (const c of hypr.get_clients()) {
-                c.notify("width")
-                c.notify("height")
-                c.notify("x")
-                c.notify("y")
-            }
-            return GLib.SOURCE_REMOVE
-        })
+        animateUpdate()
     })
 
     return (
@@ -225,10 +246,6 @@ function SysTray() {
                         cssClasses={["tray-item"]}
                         tooltipMarkup={createBinding(item, "tooltip-markup")}
                         onClicked={() => item.activate(0, 0)}
-                        onScroll={(self, e) => {
-                            const dir = e.direction === 0 ? 4 : 5 
-                            item.scroll(dir, 0)
-                        }}
                     >
                         <image gicon={createBinding(item, "gicon")} />
                     </button>
@@ -284,23 +301,63 @@ function Media() {
 }
 
 function Network() {
+    if (!AstalNetwork) {
+        return (
+            <button cssClasses={["network"]} onClicked={() => app.toggle_window("network")}>
+                <image iconName="network-wireless-offline-symbolic" />
+            </button>
+        )
+    }
+    
+    const net = AstalNetwork.get_default()
+    
+    // We bind directly to net.wifi's icon-name if available
+    const iconName = createComputed(() => {
+        // Unfortunately in AstalNetwork, we can't easily bind to a nested property if it might be null.
+        // We will just bind to net.wifi icon directly.
+        return ""
+    })
+    
     return (
         <button 
             cssClasses={["network"]}
             onClicked={() => app.toggle_window("network")}
         >
-            <image iconName="network-wireless-signal-good-symbolic" />
+            <With value={createBinding(net, "wifi")}>
+                {(wifi: any) => {
+                    if (!wifi) return <image iconName="network-wireless-offline-symbolic" />
+                    return <image iconName={createBinding(wifi, "icon-name")} />
+                }}
+            </With>
         </button>
     )
 }
 
 function Bluetooth() {
+    if (!AstalBluetooth) {
+        return (
+            <button cssClasses={["bluetooth"]} onClicked={() => app.toggle_window("bluetooth")}>
+                <image iconName="bluetooth-disabled-symbolic" />
+            </button>
+        )
+    }
+    
+    const bt = AstalBluetooth.get_default()
+    const isPowered = createBinding(bt, "is-powered")
+    const isConnected = createBinding(bt, "is-connected")
+    
+    const iconName = createComputed(() => {
+        if (!isPowered()) return "bluetooth-disabled-symbolic"
+        if (isConnected()) return "bluetooth-active-symbolic"
+        return "bluetooth-disconnected-symbolic"
+    })
+    
     return (
         <button 
             cssClasses={["bluetooth"]}
             onClicked={() => app.toggle_window("bluetooth")}
         >
-            <image iconName="bluetooth-active-symbolic" />
+            <image iconName={iconName} />
         </button>
     )
 }
@@ -334,27 +391,42 @@ export default function Bar() {
                 Astal.WindowAnchor.LEFT |
                 Astal.WindowAnchor.RIGHT
             }>
-            <Gtk.CenterBox 
-                cssClasses={["bar-layout"]}
-                start_widget={
-                    <box halign={Gtk.Align.START} spacing={12}>
-                        <Workspaces />
-                    </box>
-                }
-                center_widget={
-                    <box halign={Gtk.Align.CENTER} spacing={12}>
-                        <Network />
-                        <Bluetooth />
-                    </box>
-                }
-                end_widget={
-                    <box halign={Gtk.Align.END} spacing={12}>
-                        <Media />
-                        <Clock />
-                        <SysTray />
-                    </box>
-                }
-            />
+            <overlay>
+                <Gtk.CenterBox 
+                    cssClasses={["bar-layout"]}
+                    start_widget={
+                        <box halign={Gtk.Align.START} spacing={12}>
+                            <Workspaces />
+                        </box>
+                    }
+                    center_widget={
+                        <box halign={Gtk.Align.CENTER} spacing={12}>
+                            <Network />
+                            <Bluetooth />
+                        </box>
+                    }
+                    end_widget={
+                        <box halign={Gtk.Align.END} spacing={12}>
+                            <button 
+                                cssClasses={["tray-item"]}
+                                onClicked={() => app.toggle_window("powermenu")}
+                            >
+                                <image iconName="system-shutdown-symbolic" />
+                            </button>
+                            <button 
+                                cssClasses={["tray-item"]}
+                                onClicked={() => app.toggle_window("notifications")}
+                            >
+                                <image iconName="preferences-system-notifications-symbolic" />
+                            </button>
+                            <Media />
+                            <Clock />
+                            <SysTray />
+                        </box>
+                    }
+                />
+                <ParticleOrb />
+            </overlay>
         </window>
     )
 }

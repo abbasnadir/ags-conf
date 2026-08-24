@@ -1,5 +1,6 @@
 import { Astal, Gtk } from "ags/gtk4"
-import { createBinding, For, createState, With } from "gnim"
+import Flames from "./Flames"
+import { createBinding, For, createState, With, createComputed } from "gnim"
 import app from "ags/gtk4/app"
 import GLib from "gi://GLib"
 import Gio from "gi://Gio"
@@ -26,7 +27,6 @@ async function execAsync(cmd: string): Promise<string> {
 function APItem({ ap, wifi }: { ap: any, wifi: any }) {
     const ssid = createBinding(ap, "ssid")
     const iconName = createBinding(ap, "icon-name")
-    const active = createBinding(wifi, "active-access-point")
 
     const [expanded, setExpanded] = createState(false)
     const [errorMsg, setErrorMsg] = createState("")
@@ -45,7 +45,7 @@ function APItem({ ap, wifi }: { ap: any, wifi: any }) {
             } else {
                 await execAsync(`nmcli device wifi connect "${s}"`)
             }
-            app.toggle_window("network") // Close on success
+            app.toggle_window("network")
         } catch (e) {
             setErrorMsg(String(e))
         }
@@ -55,23 +55,16 @@ function APItem({ ap, wifi }: { ap: any, wifi: any }) {
         <box orientation={Gtk.Orientation.VERTICAL} cssClasses={["ap-container"]}>
             <button 
                 cssClasses={["ap-btn"]}
-                onClicked={() => {
-                    const isActive = active()?.get_ssid() === ap.get_ssid()
-                    if (isActive) return
-                    setExpanded(!expanded())
-                }}
+                onClicked={() => setExpanded(!expanded())}
             >
                 <box spacing={8}>
                     <image iconName={iconName} />
-                    <label label={ssid((s: string) => {
-                        const isActive = active()?.get_ssid() === s
-                        return isActive ? `[Connected] ${s || "Unknown"}` : (s || "Unknown")
-                    })} />
+                    <label label={ssid((s: string) => s || "Unknown")} />
                 </box>
             </button>
             <With value={expanded}>
                 {(exp: boolean) => exp ? (
-                    <box orientation={Gtk.Orientation.VERTICAL} spacing={4} cssClasses={["ap-password-box"]}>
+                    <box orientation={Gtk.Orientation.VERTICAL} spacing={4} cssClasses={["ap-password-box"]} margin-top={4} margin-bottom={4}>
                         <entry 
                             placeholder_text="Password (if needed)"
                             visibility={false}
@@ -88,6 +81,42 @@ function APItem({ ap, wifi }: { ap: any, wifi: any }) {
     )
 }
 
+function ConnectedNetworkHero({ wifi }: { wifi: any }) {
+    const activeAP = createBinding(wifi, "active-access-point")
+    
+    return (
+        <With value={activeAP}>
+            {(ap: any) => {
+                if (!ap) return <box />
+                const ssid = createBinding(ap, "ssid")
+                const iconName = createBinding(ap, "icon-name")
+                const strength = createBinding(ap, "strength")
+                
+                return (
+                    <box cssClasses={["connected-hero"]} orientation={Gtk.Orientation.VERTICAL} spacing={8}>
+                        <label label="Currently Connected" halign={Gtk.Align.START} cssClasses={["dim", "small-text"]} />
+                        <box spacing={12} cssClasses={["ap-btn", "connected"]} hexpand>
+                            <image iconName={iconName} pixelSize={32} />
+                            <box orientation={Gtk.Orientation.VERTICAL} hexpand halign={Gtk.Align.START}>
+                                <label label={ssid((s: string) => s || "Unknown")} cssClasses={["network-title"]} />
+                                <label label={strength((s: number) => `Signal Strength: ${s}%`)} cssClasses={["dim"]} />
+                            </box>
+                            <button 
+                                cssClasses={["connect-btn"]}
+                                onClicked={() => {
+                                    execAsync(`nmcli connection down "${ap.get_ssid()}"`).catch(console.error)
+                                }}
+                            >
+                                <label label="Disconnect" />
+                            </button>
+                        </box>
+                    </box>
+                )
+            }}
+        </With>
+    )
+}
+
 export default function NetworkWindow() {
     if (!AstalNetwork) return <window name="network" application={app} visible={false}><box/></window>
 
@@ -96,10 +125,31 @@ export default function NetworkWindow() {
     if (!wifi) return <window name="network" application={app} visible={false}><box/></window>
 
     const accessPoints = createBinding(wifi, "access-points")
+    const activeAP = createBinding(wifi, "active-access-point")
+    
+    // Filter out the active one and hidden networks from the list below
+    const availablePoints = createComputed(() => {
+        const aps = accessPoints() || []
+        const active = activeAP()
+        
+        const activeBssid = active ? active.get_bssid() : null
+        const activeSsid = active ? active.get_ssid() : null
+        
+        return aps.filter((ap: any) => {
+            const ssid = ap.get_ssid()
+            // Hide networks with empty/unknown names
+            if (!ssid || ssid.trim() === "") return false
+            if (active) {
+                return ap.get_bssid() !== activeBssid && ssid !== activeSsid
+            }
+            return true
+        })
+    })
 
     return (
         <window
             name="network"
+            cssClasses={["popup-window"]}
             application={app}
             visible={false}
             layer={Astal.Layer.OVERLAY}
@@ -108,7 +158,6 @@ export default function NetworkWindow() {
             anchor={Astal.WindowAnchor.BOTTOM}
             margin-bottom={50}
             $={(self) => {
-                // Auto-close when clicking outside (losing focus)
                 self.connect("notify::is-active", () => {
                     if (!self.is_active && self.visible) {
                         self.visible = false
@@ -116,43 +165,60 @@ export default function NetworkWindow() {
                 })
             }}
         >
-            <box 
-                cssClasses={["network-window"]} 
-                orientation={Gtk.Orientation.VERTICAL} 
-                spacing={8}
-            >
+            <box cssClasses={["network-window"]}>
+                <overlay hexpand vexpand>
+                    <Flames />
+                    <box $type="overlay" hexpand vexpand
+                    $={(self: any) => {
+                        GLib.idle_add(GLib.PRIORITY_DEFAULT, () => {
+                            const parent = self.get_parent();
+                            if (parent && parent.set_measure_overlay) {
+                                parent.set_measure_overlay(self, true);
+                            }
+                            return GLib.SOURCE_REMOVE;
+                        });
+                    }} orientation={Gtk.Orientation.VERTICAL} 
+                        spacing={12}
+                    >
                 <box halign={Gtk.Align.FILL}>
-                    <label cssClasses={["network-title"]} label="Wi-Fi Networks" hexpand halign={Gtk.Align.START} />
-                        <button 
-                            cssClasses={["refresh-btn"]}
-                            tooltipText="Scan for networks"
-                            onClicked={() => wifi.scan()}
-                        >
-                            <image iconName="view-refresh-symbolic" />
-                        </button>
-                    </box>
-                    
-                    <Gtk.ScrolledWindow heightRequest={350} widthRequest={300}>
-                        <box orientation={Gtk.Orientation.VERTICAL} spacing={4}>
-                            <For each={accessPoints}>
-                                {(ap: any) => <APItem ap={ap} wifi={wifi} />}
-                            </For>
-                        </box>
-                    </Gtk.ScrolledWindow>
-                    
-                    <box cssClasses={["network-footer"]} halign={Gtk.Align.FILL}>
-                        <button 
-                            hexpand
-                            cssClasses={["advanced-settings-btn"]} 
-                            onClicked={() => {
-                                GLib.spawn_command_line_async("nm-connection-editor")
-                                app.toggle_window("network")
-                            }}
-                        >
-                            <label label="Advanced Settings" />
-                        </button>
-                    </box>
+                    <label cssClasses={["network-title"]} label="Wi-Fi Settings" hexpand halign={Gtk.Align.START} />
+                    <button 
+                        cssClasses={["refresh-btn"]}
+                        tooltipText="Scan for networks"
+                        onClicked={() => wifi.scan()}
+                    >
+                        <image iconName="view-refresh-symbolic" />
+                    </button>
                 </box>
+                
+                <ConnectedNetworkHero wifi={wifi} />
+                
+                <Gtk.Separator />
+                
+                <label label="Available Networks" halign={Gtk.Align.START} cssClasses={["dim", "small-text"]} />
+                <Gtk.ScrolledWindow heightRequest={250} widthRequest={300}>
+                    <box orientation={Gtk.Orientation.VERTICAL} spacing={4}>
+                        <For each={availablePoints}>
+                            {(ap: any) => <APItem ap={ap} wifi={wifi} />}
+                        </For>
+                    </box>
+                </Gtk.ScrolledWindow>
+                
+                <box cssClasses={["network-footer"]} halign={Gtk.Align.FILL}>
+                    <button 
+                        hexpand
+                        cssClasses={["advanced-settings-btn"]} 
+                        onClicked={() => {
+                            GLib.spawn_command_line_async("kitty -e nmtui")
+                            app.toggle_window("network")
+                        }}
+                    >
+                        <label label="Advanced Settings" />
+                    </button>
+                </box>
+            </box>
+            </overlay>
+            </box>
         </window>
     )
 }
