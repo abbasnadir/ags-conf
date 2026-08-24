@@ -220,6 +220,17 @@ window.topBar {
   padding: 4px 12px;
 }
 
+.tray-item {
+  background: transparent;
+  color: #ffffff;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.tray-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .workspace-btn, .clock, .network, .bluetooth, .media-item, .app {
   background: transparent;
   color: $text-secondary;
@@ -418,7 +429,7 @@ progressbar.ai-laser-progress progress {
   transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.5s ease, border-color 0.5s ease;
 }
 .workspace-btn:hover .workspace-minimap {
-  transform: perspective(400px) rotateY(345deg) rotateX(10deg) scale(1.15);
+  transform: perspective(400px) rotateY(-15deg) rotateX(10deg) scale(1.15);
   box-shadow: -10px 15px 20px rgba(0,0,0,0.6);
   border-color: rgba(255,255,255,0.4);
 }
@@ -2191,1327 +2202,1061 @@ window.popup-window {
 }
 
 
+
 /* GOOEY FIRE EFFECT */
 .ember-wrap {
   min-width: 0px;
   min-height: 0px;
-  animation: fire-fade-in 0.8s ease-out forwards;
-}
-
-@keyframes fire-fade-in {
-  0% { opacity: 0; }
-  100% { opacity: 1; }
 }
 
 .fire-goo {
-  min-height: 140px;
-  margin-bottom: -60px;
-  background: linear-gradient(to top, #990000 0%, #ff3300 40%, #ff6600 75%, #ffcc00 100%);
-  filter: blur(12px) contrast(30);
+  background: linear-gradient(to top, rgba(90, 20, 0, 0.7) 0px, rgba(150, 50, 0, 0.4) 75px, rgba(200, 80, 0, 0.2) 150px, transparent 250px);
+  filter: blur(20px) contrast(30);
+  transform: scale(1.1) translateY(10px);
 }
 
 .burn-goo {
-  background: rgb(15, 15, 15);
+  background: rgb(10, 10, 10);
   border-radius: 50%;
 }
 
 .burn-goo-1 {
-  min-width: 67px;
-  min-height: 67px;
-  animation: burning-goo-1 2192ms 0ms infinite linear;
+  min-width: 95px;
+  min-height: 95px;
+  animation: burning-goo-1 4728ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-1 {
-  0% { transform: translateX(-76px) translateY(-76.8px); }
-  10.55% { transform: translateX(-76px) translateY(-100px); }
-  10.56% { transform: translateX(-76px) translateY(120px); }
-  100% { transform: translateX(-76px) translateY(-76.8px); }
+  0% { transform: translateX(-195px) translateY(274.4px); }
+  53.49% { transform: translateX(-195px) translateY(-100px); }
+  53.50% { transform: translateX(-195px) translateY(600px); }
+  100% { transform: translateX(-195px) translateY(274.4px); }
 }
 
 .burn-goo-2 {
-  min-width: 73px;
-  min-height: 73px;
-  animation: burning-goo-2 1506ms 0ms infinite linear;
+  min-width: 63px;
+  min-height: 63px;
+  animation: burning-goo-2 3203ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-2 {
-  0% { transform: translateX(-248px) translateY(12.3px); }
-  51.03% { transform: translateX(-248px) translateY(-100px); }
-  51.04% { transform: translateX(-248px) translateY(120px); }
-  100% { transform: translateX(-248px) translateY(12.3px); }
+  0% { transform: translateX(277px) translateY(-86.6px); }
+  1.91% { transform: translateX(277px) translateY(-100px); }
+  1.92% { transform: translateX(277px) translateY(600px); }
+  100% { transform: translateX(277px) translateY(-86.6px); }
 }
 
 .burn-goo-3 {
-  min-width: 48px;
-  min-height: 48px;
-  animation: burning-goo-3 1958ms 0ms infinite linear;
+  min-width: 42px;
+  min-height: 42px;
+  animation: burning-goo-3 5417ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-3 {
-  0% { transform: translateX(88px) translateY(-83.0px); }
-  7.73% { transform: translateX(88px) translateY(-100px); }
-  7.74% { transform: translateX(88px) translateY(120px); }
-  100% { transform: translateX(88px) translateY(-83.0px); }
+  0% { transform: translateX(-170px) translateY(-63.4px); }
+  5.24% { transform: translateX(-170px) translateY(-100px); }
+  5.25% { transform: translateX(-170px) translateY(600px); }
+  100% { transform: translateX(-170px) translateY(-63.4px); }
 }
 
 .burn-goo-4 {
-  min-width: 65px;
-  min-height: 65px;
-  animation: burning-goo-4 2041ms 0ms infinite linear;
+  min-width: 75px;
+  min-height: 75px;
+  animation: burning-goo-4 3511ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-4 {
-  0% { transform: translateX(62px) translateY(110.1px); }
-  95.51% { transform: translateX(62px) translateY(-100px); }
-  95.52% { transform: translateX(62px) translateY(120px); }
-  100% { transform: translateX(62px) translateY(110.1px); }
+  0% { transform: translateX(288px) translateY(356.1px); }
+  65.16% { transform: translateX(288px) translateY(-100px); }
+  65.17% { transform: translateX(288px) translateY(600px); }
+  100% { transform: translateX(288px) translateY(356.1px); }
 }
 
 .burn-goo-5 {
-  min-width: 57px;
-  min-height: 57px;
-  animation: burning-goo-5 1835ms 0ms infinite linear;
+  min-width: 112px;
+  min-height: 112px;
+  animation: burning-goo-5 3749ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-5 {
-  0% { transform: translateX(-155px) translateY(-72.6px); }
-  12.43% { transform: translateX(-155px) translateY(-100px); }
-  12.44% { transform: translateX(-155px) translateY(120px); }
-  100% { transform: translateX(-155px) translateY(-72.6px); }
+  0% { transform: translateX(255px) translateY(194.3px); }
+  42.04% { transform: translateX(255px) translateY(-100px); }
+  42.05% { transform: translateX(255px) translateY(600px); }
+  100% { transform: translateX(255px) translateY(194.3px); }
 }
 
 .burn-goo-6 {
-  min-width: 27px;
-  min-height: 27px;
-  animation: burning-goo-6 1584ms 0ms infinite linear;
+  min-width: 104px;
+  min-height: 104px;
+  animation: burning-goo-6 5787ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-6 {
-  0% { transform: translateX(-15px) translateY(22.0px); }
-  55.47% { transform: translateX(-15px) translateY(-100px); }
-  55.48% { transform: translateX(-15px) translateY(120px); }
-  100% { transform: translateX(-15px) translateY(22.0px); }
+  0% { transform: translateX(268px) translateY(598.5px); }
+  99.78% { transform: translateX(268px) translateY(-100px); }
+  99.79% { transform: translateX(268px) translateY(600px); }
+  100% { transform: translateX(268px) translateY(598.5px); }
 }
 
 .burn-goo-7 {
-  min-width: 52px;
-  min-height: 52px;
-  animation: burning-goo-7 1231ms 0ms infinite linear;
+  min-width: 100px;
+  min-height: 100px;
+  animation: burning-goo-7 4280ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-7 {
-  0% { transform: translateX(105px) translateY(14.4px); }
-  52.01% { transform: translateX(105px) translateY(-100px); }
-  52.02% { transform: translateX(105px) translateY(120px); }
-  100% { transform: translateX(105px) translateY(14.4px); }
+  0% { transform: translateX(40px) translateY(-93.5px); }
+  0.94% { transform: translateX(40px) translateY(-100px); }
+  0.95% { transform: translateX(40px) translateY(600px); }
+  100% { transform: translateX(40px) translateY(-93.5px); }
 }
 
 .burn-goo-8 {
-  min-width: 32px;
-  min-height: 32px;
-  animation: burning-goo-8 2078ms 0ms infinite linear;
+  min-width: 90px;
+  min-height: 90px;
+  animation: burning-goo-8 3898ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-8 {
-  0% { transform: translateX(-215px) translateY(-28.5px); }
-  32.51% { transform: translateX(-215px) translateY(-100px); }
-  32.52% { transform: translateX(-215px) translateY(120px); }
-  100% { transform: translateX(-215px) translateY(-28.5px); }
+  0% { transform: translateX(182px) translateY(68.4px); }
+  24.05% { transform: translateX(182px) translateY(-100px); }
+  24.06% { transform: translateX(182px) translateY(600px); }
+  100% { transform: translateX(182px) translateY(68.4px); }
 }
 
 .burn-goo-9 {
-  min-width: 42px;
-  min-height: 42px;
-  animation: burning-goo-9 1889ms 0ms infinite linear;
+  min-width: 80px;
+  min-height: 80px;
+  animation: burning-goo-9 5238ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-9 {
-  0% { transform: translateX(110px) translateY(64.4px); }
-  74.71% { transform: translateX(110px) translateY(-100px); }
-  74.72% { transform: translateX(110px) translateY(120px); }
-  100% { transform: translateX(110px) translateY(64.4px); }
+  0% { transform: translateX(194px) translateY(239.8px); }
+  48.54% { transform: translateX(194px) translateY(-100px); }
+  48.55% { transform: translateX(194px) translateY(600px); }
+  100% { transform: translateX(194px) translateY(239.8px); }
 }
 
 .burn-goo-10 {
-  min-width: 51px;
-  min-height: 51px;
-  animation: burning-goo-10 1292ms 0ms infinite linear;
+  min-width: 97px;
+  min-height: 97px;
+  animation: burning-goo-10 2987ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-10 {
-  0% { transform: translateX(80px) translateY(107.8px); }
-  94.45% { transform: translateX(80px) translateY(-100px); }
-  94.46% { transform: translateX(80px) translateY(120px); }
-  100% { transform: translateX(80px) translateY(107.8px); }
+  0% { transform: translateX(135px) translateY(266.2px); }
+  52.31% { transform: translateX(135px) translateY(-100px); }
+  52.32% { transform: translateX(135px) translateY(600px); }
+  100% { transform: translateX(135px) translateY(266.2px); }
 }
 
 .burn-goo-11 {
-  min-width: 34px;
-  min-height: 34px;
-  animation: burning-goo-11 1254ms 0ms infinite linear;
+  min-width: 44px;
+  min-height: 44px;
+  animation: burning-goo-11 3496ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-11 {
-  0% { transform: translateX(0px) translateY(25.1px); }
-  56.88% { transform: translateX(0px) translateY(-100px); }
-  56.89% { transform: translateX(0px) translateY(120px); }
-  100% { transform: translateX(0px) translateY(25.1px); }
+  0% { transform: translateX(-3px) translateY(209.0px); }
+  44.15% { transform: translateX(-3px) translateY(-100px); }
+  44.16% { transform: translateX(-3px) translateY(600px); }
+  100% { transform: translateX(-3px) translateY(209.0px); }
 }
 
 .burn-goo-12 {
-  min-width: 74px;
-  min-height: 74px;
-  animation: burning-goo-12 1258ms 0ms infinite linear;
+  min-width: 111px;
+  min-height: 111px;
+  animation: burning-goo-12 5903ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-12 {
-  0% { transform: translateX(191px) translateY(99.7px); }
-  90.78% { transform: translateX(191px) translateY(-100px); }
-  90.79% { transform: translateX(191px) translateY(120px); }
-  100% { transform: translateX(191px) translateY(99.7px); }
+  0% { transform: translateX(-14px) translateY(486.1px); }
+  83.73% { transform: translateX(-14px) translateY(-100px); }
+  83.74% { transform: translateX(-14px) translateY(600px); }
+  100% { transform: translateX(-14px) translateY(486.1px); }
 }
 
 .burn-goo-13 {
-  min-width: 36px;
-  min-height: 36px;
-  animation: burning-goo-13 1402ms 0ms infinite linear;
+  min-width: 105px;
+  min-height: 105px;
+  animation: burning-goo-13 4991ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-13 {
-  0% { transform: translateX(-64px) translateY(96.6px); }
-  89.37% { transform: translateX(-64px) translateY(-100px); }
-  89.38% { transform: translateX(-64px) translateY(120px); }
-  100% { transform: translateX(-64px) translateY(96.6px); }
+  0% { transform: translateX(-83px) translateY(522.9px); }
+  88.99% { transform: translateX(-83px) translateY(-100px); }
+  89.00% { transform: translateX(-83px) translateY(600px); }
+  100% { transform: translateX(-83px) translateY(522.9px); }
 }
 
 .burn-goo-14 {
-  min-width: 64px;
-  min-height: 64px;
-  animation: burning-goo-14 2164ms 0ms infinite linear;
+  min-width: 59px;
+  min-height: 59px;
+  animation: burning-goo-14 4919ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-14 {
-  0% { transform: translateX(168px) translateY(-45.1px); }
-  24.95% { transform: translateX(168px) translateY(-100px); }
-  24.96% { transform: translateX(168px) translateY(120px); }
-  100% { transform: translateX(168px) translateY(-45.1px); }
+  0% { transform: translateX(-81px) translateY(50.6px); }
+  21.51% { transform: translateX(-81px) translateY(-100px); }
+  21.52% { transform: translateX(-81px) translateY(600px); }
+  100% { transform: translateX(-81px) translateY(50.6px); }
 }
 
 .burn-goo-15 {
-  min-width: 74px;
-  min-height: 74px;
-  animation: burning-goo-15 2402ms 0ms infinite linear;
+  min-width: 116px;
+  min-height: 116px;
+  animation: burning-goo-15 3928ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-15 {
-  0% { transform: translateX(-248px) translateY(-21.9px); }
-  35.52% { transform: translateX(-248px) translateY(-100px); }
-  35.53% { transform: translateX(-248px) translateY(120px); }
-  100% { transform: translateX(-248px) translateY(-21.9px); }
+  0% { transform: translateX(223px) translateY(168.8px); }
+  38.40% { transform: translateX(223px) translateY(-100px); }
+  38.41% { transform: translateX(223px) translateY(600px); }
+  100% { transform: translateX(223px) translateY(168.8px); }
 }
 
 .burn-goo-16 {
-  min-width: 46px;
-  min-height: 46px;
-  animation: burning-goo-16 2356ms 0ms infinite linear;
+  min-width: 74px;
+  min-height: 74px;
+  animation: burning-goo-16 3606ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-16 {
-  0% { transform: translateX(-63px) translateY(-68.7px); }
-  14.21% { transform: translateX(-63px) translateY(-100px); }
-  14.22% { transform: translateX(-63px) translateY(120px); }
-  100% { transform: translateX(-63px) translateY(-68.7px); }
+  0% { transform: translateX(294px) translateY(451.6px); }
+  78.80% { transform: translateX(294px) translateY(-100px); }
+  78.81% { transform: translateX(294px) translateY(600px); }
+  100% { transform: translateX(294px) translateY(451.6px); }
 }
 
 .burn-goo-17 {
-  min-width: 71px;
-  min-height: 71px;
-  animation: burning-goo-17 1450ms 0ms infinite linear;
+  min-width: 87px;
+  min-height: 87px;
+  animation: burning-goo-17 4811ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-17 {
-  0% { transform: translateX(198px) translateY(53.3px); }
-  69.70% { transform: translateX(198px) translateY(-100px); }
-  69.71% { transform: translateX(198px) translateY(120px); }
-  100% { transform: translateX(198px) translateY(53.3px); }
+  0% { transform: translateX(191px) translateY(-47.2px); }
+  7.54% { transform: translateX(191px) translateY(-100px); }
+  7.55% { transform: translateX(191px) translateY(600px); }
+  100% { transform: translateX(191px) translateY(-47.2px); }
 }
 
 .burn-goo-18 {
-  min-width: 68px;
-  min-height: 68px;
-  animation: burning-goo-18 2450ms 0ms infinite linear;
+  min-width: 49px;
+  min-height: 49px;
+  animation: burning-goo-18 3734ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-18 {
-  0% { transform: translateX(-187px) translateY(72.7px); }
-  78.52% { transform: translateX(-187px) translateY(-100px); }
-  78.53% { transform: translateX(-187px) translateY(120px); }
-  100% { transform: translateX(-187px) translateY(72.7px); }
+  0% { transform: translateX(-65px) translateY(273.9px); }
+  53.41% { transform: translateX(-65px) translateY(-100px); }
+  53.42% { transform: translateX(-65px) translateY(600px); }
+  100% { transform: translateX(-65px) translateY(273.9px); }
 }
 
 .burn-goo-19 {
-  min-width: 53px;
-  min-height: 53px;
-  animation: burning-goo-19 2180ms 0ms infinite linear;
+  min-width: 57px;
+  min-height: 57px;
+  animation: burning-goo-19 4323ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-19 {
-  0% { transform: translateX(-238px) translateY(-31.1px); }
-  31.30% { transform: translateX(-238px) translateY(-100px); }
-  31.31% { transform: translateX(-238px) translateY(120px); }
-  100% { transform: translateX(-238px) translateY(-31.1px); }
+  0% { transform: translateX(-243px) translateY(117.6px); }
+  31.08% { transform: translateX(-243px) translateY(-100px); }
+  31.09% { transform: translateX(-243px) translateY(600px); }
+  100% { transform: translateX(-243px) translateY(117.6px); }
 }
 
 .burn-goo-20 {
-  min-width: 60px;
-  min-height: 60px;
-  animation: burning-goo-20 1440ms 0ms infinite linear;
+  min-width: 40px;
+  min-height: 40px;
+  animation: burning-goo-20 5155ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-20 {
-  0% { transform: translateX(-203px) translateY(44.8px); }
-  65.84% { transform: translateX(-203px) translateY(-100px); }
-  65.85% { transform: translateX(-203px) translateY(120px); }
-  100% { transform: translateX(-203px) translateY(44.8px); }
+  0% { transform: translateX(-215px) translateY(251.9px); }
+  50.27% { transform: translateX(-215px) translateY(-100px); }
+  50.28% { transform: translateX(-215px) translateY(600px); }
+  100% { transform: translateX(-215px) translateY(251.9px); }
 }
 
 .burn-goo-21 {
-  min-width: 53px;
-  min-height: 53px;
-  animation: burning-goo-21 1218ms 0ms infinite linear;
+  min-width: 66px;
+  min-height: 66px;
+  animation: burning-goo-21 3104ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-21 {
-  0% { transform: translateX(28px) translateY(94.8px); }
-  88.55% { transform: translateX(28px) translateY(-100px); }
-  88.56% { transform: translateX(28px) translateY(120px); }
-  100% { transform: translateX(28px) translateY(94.8px); }
+  0% { transform: translateX(-72px) translateY(321.2px); }
+  60.17% { transform: translateX(-72px) translateY(-100px); }
+  60.18% { transform: translateX(-72px) translateY(600px); }
+  100% { transform: translateX(-72px) translateY(321.2px); }
 }
 
 .burn-goo-22 {
-  min-width: 28px;
-  min-height: 28px;
-  animation: burning-goo-22 1218ms 0ms infinite linear;
+  min-width: 119px;
+  min-height: 119px;
+  animation: burning-goo-22 4006ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-22 {
-  0% { transform: translateX(-117px) translateY(-96.8px); }
-  1.47% { transform: translateX(-117px) translateY(-100px); }
-  1.48% { transform: translateX(-117px) translateY(120px); }
-  100% { transform: translateX(-117px) translateY(-96.8px); }
+  0% { transform: translateX(60px) translateY(333.7px); }
+  61.96% { transform: translateX(60px) translateY(-100px); }
+  61.97% { transform: translateX(60px) translateY(600px); }
+  100% { transform: translateX(60px) translateY(333.7px); }
 }
 
 .burn-goo-23 {
-  min-width: 75px;
-  min-height: 75px;
-  animation: burning-goo-23 1802ms 0ms infinite linear;
+  min-width: 56px;
+  min-height: 56px;
+  animation: burning-goo-23 3161ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-23 {
-  0% { transform: translateX(19px) translateY(-18.7px); }
-  36.98% { transform: translateX(19px) translateY(-100px); }
-  36.99% { transform: translateX(19px) translateY(120px); }
-  100% { transform: translateX(19px) translateY(-18.7px); }
+  0% { transform: translateX(-174px) translateY(113.6px); }
+  30.52% { transform: translateX(-174px) translateY(-100px); }
+  30.53% { transform: translateX(-174px) translateY(600px); }
+  100% { transform: translateX(-174px) translateY(113.6px); }
 }
 
 .burn-goo-24 {
-  min-width: 44px;
-  min-height: 44px;
-  animation: burning-goo-24 1893ms 0ms infinite linear;
+  min-width: 54px;
+  min-height: 54px;
+  animation: burning-goo-24 4067ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-24 {
-  0% { transform: translateX(186px) translateY(73.6px); }
-  78.91% { transform: translateX(186px) translateY(-100px); }
-  78.92% { transform: translateX(186px) translateY(120px); }
-  100% { transform: translateX(186px) translateY(73.6px); }
+  0% { transform: translateX(202px) translateY(312.3px); }
+  58.89% { transform: translateX(202px) translateY(-100px); }
+  58.90% { transform: translateX(202px) translateY(600px); }
+  100% { transform: translateX(202px) translateY(312.3px); }
 }
 
 .burn-goo-25 {
-  min-width: 59px;
-  min-height: 59px;
-  animation: burning-goo-25 1972ms 0ms infinite linear;
+  min-width: 70px;
+  min-height: 70px;
+  animation: burning-goo-25 4093ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-25 {
-  0% { transform: translateX(-140px) translateY(61.1px); }
-  73.24% { transform: translateX(-140px) translateY(-100px); }
-  73.25% { transform: translateX(-140px) translateY(120px); }
-  100% { transform: translateX(-140px) translateY(61.1px); }
+  0% { transform: translateX(128px) translateY(97.4px); }
+  28.19% { transform: translateX(128px) translateY(-100px); }
+  28.20% { transform: translateX(128px) translateY(600px); }
+  100% { transform: translateX(128px) translateY(97.4px); }
 }
 
 .burn-goo-26 {
-  min-width: 66px;
-  min-height: 66px;
-  animation: burning-goo-26 1716ms 0ms infinite linear;
+  min-width: 97px;
+  min-height: 97px;
+  animation: burning-goo-26 5404ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-26 {
-  0% { transform: translateX(-89px) translateY(-29.0px); }
-  32.25% { transform: translateX(-89px) translateY(-100px); }
-  32.26% { transform: translateX(-89px) translateY(120px); }
-  100% { transform: translateX(-89px) translateY(-29.0px); }
+  0% { transform: translateX(228px) translateY(-61.4px); }
+  5.52% { transform: translateX(228px) translateY(-100px); }
+  5.53% { transform: translateX(228px) translateY(600px); }
+  100% { transform: translateX(228px) translateY(-61.4px); }
 }
 
 .burn-goo-27 {
-  min-width: 72px;
-  min-height: 72px;
-  animation: burning-goo-27 2382ms 0ms infinite linear;
+  min-width: 107px;
+  min-height: 107px;
+  animation: burning-goo-27 4213ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-27 {
-  0% { transform: translateX(-165px) translateY(-88.2px); }
-  5.37% { transform: translateX(-165px) translateY(-100px); }
-  5.38% { transform: translateX(-165px) translateY(120px); }
-  100% { transform: translateX(-165px) translateY(-88.2px); }
+  0% { transform: translateX(144px) translateY(114.4px); }
+  30.62% { transform: translateX(144px) translateY(-100px); }
+  30.63% { transform: translateX(144px) translateY(600px); }
+  100% { transform: translateX(144px) translateY(114.4px); }
 }
 
 .burn-goo-28 {
-  min-width: 38px;
-  min-height: 38px;
-  animation: burning-goo-28 1393ms 0ms infinite linear;
+  min-width: 48px;
+  min-height: 48px;
+  animation: burning-goo-28 4131ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-28 {
-  0% { transform: translateX(2px) translateY(52.1px); }
-  69.13% { transform: translateX(2px) translateY(-100px); }
-  69.14% { transform: translateX(2px) translateY(120px); }
-  100% { transform: translateX(2px) translateY(52.1px); }
+  0% { transform: translateX(127px) translateY(17.2px); }
+  16.75% { transform: translateX(127px) translateY(-100px); }
+  16.76% { transform: translateX(127px) translateY(600px); }
+  100% { transform: translateX(127px) translateY(17.2px); }
 }
 
 .burn-goo-29 {
-  min-width: 64px;
-  min-height: 64px;
-  animation: burning-goo-29 1553ms 0ms infinite linear;
+  min-width: 86px;
+  min-height: 86px;
+  animation: burning-goo-29 3488ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-29 {
-  0% { transform: translateX(0px) translateY(-26.7px); }
-  33.31% { transform: translateX(0px) translateY(-100px); }
-  33.32% { transform: translateX(0px) translateY(120px); }
-  100% { transform: translateX(0px) translateY(-26.7px); }
+  0% { transform: translateX(155px) translateY(57.8px); }
+  22.54% { transform: translateX(155px) translateY(-100px); }
+  22.55% { transform: translateX(155px) translateY(600px); }
+  100% { transform: translateX(155px) translateY(57.8px); }
 }
 
 .burn-goo-30 {
-  min-width: 63px;
-  min-height: 63px;
-  animation: burning-goo-30 1976ms 0ms infinite linear;
+  min-width: 65px;
+  min-height: 65px;
+  animation: burning-goo-30 2810ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-30 {
-  0% { transform: translateX(156px) translateY(102.6px); }
-  92.08% { transform: translateX(156px) translateY(-100px); }
-  92.09% { transform: translateX(156px) translateY(120px); }
-  100% { transform: translateX(156px) translateY(102.6px); }
+  0% { transform: translateX(287px) translateY(597.1px); }
+  99.59% { transform: translateX(287px) translateY(-100px); }
+  99.60% { transform: translateX(287px) translateY(600px); }
+  100% { transform: translateX(287px) translateY(597.1px); }
 }
 
 .burn-goo-31 {
-  min-width: 59px;
-  min-height: 59px;
-  animation: burning-goo-31 2410ms 0ms infinite linear;
+  min-width: 108px;
+  min-height: 108px;
+  animation: burning-goo-31 2896ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-31 {
-  0% { transform: translateX(210px) translateY(79.4px); }
-  81.53% { transform: translateX(210px) translateY(-100px); }
-  81.54% { transform: translateX(210px) translateY(120px); }
-  100% { transform: translateX(210px) translateY(79.4px); }
+  0% { transform: translateX(20px) translateY(151.0px); }
+  35.86% { transform: translateX(20px) translateY(-100px); }
+  35.87% { transform: translateX(20px) translateY(600px); }
+  100% { transform: translateX(20px) translateY(151.0px); }
 }
 
 .burn-goo-32 {
-  min-width: 51px;
-  min-height: 51px;
-  animation: burning-goo-32 1981ms 0ms infinite linear;
+  min-width: 74px;
+  min-height: 74px;
+  animation: burning-goo-32 4526ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-32 {
-  0% { transform: translateX(186px) translateY(75.4px); }
-  79.73% { transform: translateX(186px) translateY(-100px); }
-  79.74% { transform: translateX(186px) translateY(120px); }
-  100% { transform: translateX(186px) translateY(75.4px); }
+  0% { transform: translateX(144px) translateY(494.0px); }
+  84.86% { transform: translateX(144px) translateY(-100px); }
+  84.87% { transform: translateX(144px) translateY(600px); }
+  100% { transform: translateX(144px) translateY(494.0px); }
 }
 
 .burn-goo-33 {
-  min-width: 53px;
-  min-height: 53px;
-  animation: burning-goo-33 2160ms 0ms infinite linear;
+  min-width: 58px;
+  min-height: 58px;
+  animation: burning-goo-33 5714ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-33 {
-  0% { transform: translateX(-124px) translateY(50.9px); }
-  68.60% { transform: translateX(-124px) translateY(-100px); }
-  68.61% { transform: translateX(-124px) translateY(120px); }
-  100% { transform: translateX(-124px) translateY(50.9px); }
+  0% { transform: translateX(-256px) translateY(488.3px); }
+  84.04% { transform: translateX(-256px) translateY(-100px); }
+  84.05% { transform: translateX(-256px) translateY(600px); }
+  100% { transform: translateX(-256px) translateY(488.3px); }
 }
 
 .burn-goo-34 {
-  min-width: 51px;
-  min-height: 51px;
-  animation: burning-goo-34 1737ms 0ms infinite linear;
+  min-width: 49px;
+  min-height: 49px;
+  animation: burning-goo-34 3137ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-34 {
-  0% { transform: translateX(-241px) translateY(-77.6px); }
-  10.20% { transform: translateX(-241px) translateY(-100px); }
-  10.21% { transform: translateX(-241px) translateY(120px); }
-  100% { transform: translateX(-241px) translateY(-77.6px); }
+  0% { transform: translateX(179px) translateY(-31.9px); }
+  9.73% { transform: translateX(179px) translateY(-100px); }
+  9.74% { transform: translateX(179px) translateY(600px); }
+  100% { transform: translateX(179px) translateY(-31.9px); }
 }
 
 .burn-goo-35 {
-  min-width: 53px;
-  min-height: 53px;
-  animation: burning-goo-35 1694ms 0ms infinite linear;
+  min-width: 72px;
+  min-height: 72px;
+  animation: burning-goo-35 4212ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-35 {
-  0% { transform: translateX(27px) translateY(62.8px); }
-  73.98% { transform: translateX(27px) translateY(-100px); }
-  73.99% { transform: translateX(27px) translateY(120px); }
-  100% { transform: translateX(27px) translateY(62.8px); }
+  0% { transform: translateX(153px) translateY(196.2px); }
+  42.32% { transform: translateX(153px) translateY(-100px); }
+  42.33% { transform: translateX(153px) translateY(600px); }
+  100% { transform: translateX(153px) translateY(196.2px); }
 }
 
 .burn-goo-36 {
-  min-width: 37px;
-  min-height: 37px;
-  animation: burning-goo-36 1378ms 0ms infinite linear;
+  min-width: 77px;
+  min-height: 77px;
+  animation: burning-goo-36 3823ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-36 {
-  0% { transform: translateX(116px) translateY(-51.4px); }
-  22.08% { transform: translateX(116px) translateY(-100px); }
-  22.09% { transform: translateX(116px) translateY(120px); }
-  100% { transform: translateX(116px) translateY(-51.4px); }
+  0% { transform: translateX(105px) translateY(118.1px); }
+  31.15% { transform: translateX(105px) translateY(-100px); }
+  31.16% { transform: translateX(105px) translateY(600px); }
+  100% { transform: translateX(105px) translateY(118.1px); }
 }
 
 .burn-goo-37 {
-  min-width: 24px;
-  min-height: 24px;
-  animation: burning-goo-37 1883ms 0ms infinite linear;
+  min-width: 104px;
+  min-height: 104px;
+  animation: burning-goo-37 3779ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-37 {
-  0% { transform: translateX(-202px) translateY(98.7px); }
-  90.33% { transform: translateX(-202px) translateY(-100px); }
-  90.34% { transform: translateX(-202px) translateY(120px); }
-  100% { transform: translateX(-202px) translateY(98.7px); }
+  0% { transform: translateX(63px) translateY(189.3px); }
+  41.33% { transform: translateX(63px) translateY(-100px); }
+  41.34% { transform: translateX(63px) translateY(600px); }
+  100% { transform: translateX(63px) translateY(189.3px); }
 }
 
 .burn-goo-38 {
-  min-width: 27px;
-  min-height: 27px;
-  animation: burning-goo-38 1510ms 0ms infinite linear;
+  min-width: 85px;
+  min-height: 85px;
+  animation: burning-goo-38 3714ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-38 {
-  0% { transform: translateX(77px) translateY(-89.0px); }
-  4.99% { transform: translateX(77px) translateY(-100px); }
-  5.00% { transform: translateX(77px) translateY(120px); }
-  100% { transform: translateX(77px) translateY(-89.0px); }
+  0% { transform: translateX(147px) translateY(403.3px); }
+  71.90% { transform: translateX(147px) translateY(-100px); }
+  71.91% { transform: translateX(147px) translateY(600px); }
+  100% { transform: translateX(147px) translateY(403.3px); }
 }
 
 .burn-goo-39 {
-  min-width: 61px;
-  min-height: 61px;
-  animation: burning-goo-39 2444ms 0ms infinite linear;
+  min-width: 82px;
+  min-height: 82px;
+  animation: burning-goo-39 4704ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-39 {
-  0% { transform: translateX(-9px) translateY(-33.0px); }
-  30.47% { transform: translateX(-9px) translateY(-100px); }
-  30.48% { transform: translateX(-9px) translateY(120px); }
-  100% { transform: translateX(-9px) translateY(-33.0px); }
+  0% { transform: translateX(-242px) translateY(-69.8px); }
+  4.32% { transform: translateX(-242px) translateY(-100px); }
+  4.33% { transform: translateX(-242px) translateY(600px); }
+  100% { transform: translateX(-242px) translateY(-69.8px); }
 }
 
 .burn-goo-40 {
-  min-width: 77px;
-  min-height: 77px;
-  animation: burning-goo-40 1937ms 0ms infinite linear;
+  min-width: 85px;
+  min-height: 85px;
+  animation: burning-goo-40 5655ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-40 {
-  0% { transform: translateX(-54px) translateY(6.3px); }
-  48.30% { transform: translateX(-54px) translateY(-100px); }
-  48.31% { transform: translateX(-54px) translateY(120px); }
-  100% { transform: translateX(-54px) translateY(6.3px); }
+  0% { transform: translateX(-25px) translateY(255.1px); }
+  50.73% { transform: translateX(-25px) translateY(-100px); }
+  50.74% { transform: translateX(-25px) translateY(600px); }
+  100% { transform: translateX(-25px) translateY(255.1px); }
 }
 
 .burn-goo-41 {
-  min-width: 22px;
-  min-height: 22px;
-  animation: burning-goo-41 1735ms 0ms infinite linear;
+  min-width: 63px;
+  min-height: 63px;
+  animation: burning-goo-41 2869ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-41 {
-  0% { transform: translateX(-211px) translateY(92.0px); }
-  87.26% { transform: translateX(-211px) translateY(-100px); }
-  87.27% { transform: translateX(-211px) translateY(120px); }
-  100% { transform: translateX(-211px) translateY(92.0px); }
+  0% { transform: translateX(85px) translateY(-57.5px); }
+  6.07% { transform: translateX(85px) translateY(-100px); }
+  6.08% { transform: translateX(85px) translateY(600px); }
+  100% { transform: translateX(85px) translateY(-57.5px); }
 }
 
 .burn-goo-42 {
-  min-width: 70px;
-  min-height: 70px;
-  animation: burning-goo-42 1305ms 0ms infinite linear;
+  min-width: 77px;
+  min-height: 77px;
+  animation: burning-goo-42 4059ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-42 {
-  0% { transform: translateX(-150px) translateY(-96.7px); }
-  1.48% { transform: translateX(-150px) translateY(-100px); }
-  1.49% { transform: translateX(-150px) translateY(120px); }
-  100% { transform: translateX(-150px) translateY(-96.7px); }
+  0% { transform: translateX(-274px) translateY(503.6px); }
+  86.23% { transform: translateX(-274px) translateY(-100px); }
+  86.24% { transform: translateX(-274px) translateY(600px); }
+  100% { transform: translateX(-274px) translateY(503.6px); }
 }
 
 .burn-goo-43 {
-  min-width: 45px;
-  min-height: 45px;
-  animation: burning-goo-43 2002ms 0ms infinite linear;
+  min-width: 62px;
+  min-height: 62px;
+  animation: burning-goo-43 3663ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-43 {
-  0% { transform: translateX(-26px) translateY(46.3px); }
-  66.48% { transform: translateX(-26px) translateY(-100px); }
-  66.49% { transform: translateX(-26px) translateY(120px); }
-  100% { transform: translateX(-26px) translateY(46.3px); }
+  0% { transform: translateX(105px) translateY(421.1px); }
+  74.44% { transform: translateX(105px) translateY(-100px); }
+  74.45% { transform: translateX(105px) translateY(600px); }
+  100% { transform: translateX(105px) translateY(421.1px); }
 }
 
 .burn-goo-44 {
-  min-width: 36px;
-  min-height: 36px;
-  animation: burning-goo-44 1362ms 0ms infinite linear;
+  min-width: 66px;
+  min-height: 66px;
+  animation: burning-goo-44 3497ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-44 {
-  0% { transform: translateX(-26px) translateY(106.1px); }
-  93.70% { transform: translateX(-26px) translateY(-100px); }
-  93.71% { transform: translateX(-26px) translateY(120px); }
-  100% { transform: translateX(-26px) translateY(106.1px); }
+  0% { transform: translateX(-223px) translateY(484.9px); }
+  83.56% { transform: translateX(-223px) translateY(-100px); }
+  83.57% { transform: translateX(-223px) translateY(600px); }
+  100% { transform: translateX(-223px) translateY(484.9px); }
 }
 
 .burn-goo-45 {
-  min-width: 60px;
-  min-height: 60px;
-  animation: burning-goo-45 1473ms 0ms infinite linear;
+  min-width: 108px;
+  min-height: 108px;
+  animation: burning-goo-45 2935ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-45 {
-  0% { transform: translateX(-181px) translateY(112.3px); }
-  96.50% { transform: translateX(-181px) translateY(-100px); }
-  96.51% { transform: translateX(-181px) translateY(120px); }
-  100% { transform: translateX(-181px) translateY(112.3px); }
+  0% { transform: translateX(68px) translateY(520.8px); }
+  88.69% { transform: translateX(68px) translateY(-100px); }
+  88.70% { transform: translateX(68px) translateY(600px); }
+  100% { transform: translateX(68px) translateY(520.8px); }
 }
 
 .burn-goo-46 {
-  min-width: 66px;
-  min-height: 66px;
-  animation: burning-goo-46 2319ms 0ms infinite linear;
+  min-width: 104px;
+  min-height: 104px;
+  animation: burning-goo-46 3366ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-46 {
-  0% { transform: translateX(135px) translateY(-32.5px); }
-  30.66% { transform: translateX(135px) translateY(-100px); }
-  30.67% { transform: translateX(135px) translateY(120px); }
-  100% { transform: translateX(135px) translateY(-32.5px); }
+  0% { transform: translateX(-215px) translateY(64.5px); }
+  23.50% { transform: translateX(-215px) translateY(-100px); }
+  23.51% { transform: translateX(-215px) translateY(600px); }
+  100% { transform: translateX(-215px) translateY(64.5px); }
 }
 
 .burn-goo-47 {
-  min-width: 63px;
-  min-height: 63px;
-  animation: burning-goo-47 1280ms 0ms infinite linear;
+  min-width: 42px;
+  min-height: 42px;
+  animation: burning-goo-47 5405ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-47 {
-  0% { transform: translateX(-212px) translateY(-73.5px); }
-  12.07% { transform: translateX(-212px) translateY(-100px); }
-  12.08% { transform: translateX(-212px) translateY(120px); }
-  100% { transform: translateX(-212px) translateY(-73.5px); }
+  0% { transform: translateX(-113px) translateY(325.9px); }
+  60.85% { transform: translateX(-113px) translateY(-100px); }
+  60.86% { transform: translateX(-113px) translateY(600px); }
+  100% { transform: translateX(-113px) translateY(325.9px); }
 }
 
 .burn-goo-48 {
-  min-width: 37px;
-  min-height: 37px;
-  animation: burning-goo-48 2167ms 0ms infinite linear;
+  min-width: 85px;
+  min-height: 85px;
+  animation: burning-goo-48 4169ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-48 {
-  0% { transform: translateX(4px) translateY(39.2px); }
-  63.28% { transform: translateX(4px) translateY(-100px); }
-  63.29% { transform: translateX(4px) translateY(120px); }
-  100% { transform: translateX(4px) translateY(39.2px); }
+  0% { transform: translateX(-65px) translateY(255.0px); }
+  50.72% { transform: translateX(-65px) translateY(-100px); }
+  50.73% { transform: translateX(-65px) translateY(600px); }
+  100% { transform: translateX(-65px) translateY(255.0px); }
 }
 
 .burn-goo-49 {
-  min-width: 40px;
-  min-height: 40px;
-  animation: burning-goo-49 2486ms 0ms infinite linear;
+  min-width: 77px;
+  min-height: 77px;
+  animation: burning-goo-49 5029ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-49 {
-  0% { transform: translateX(-81px) translateY(-82.7px); }
-  7.88% { transform: translateX(-81px) translateY(-100px); }
-  7.89% { transform: translateX(-81px) translateY(120px); }
-  100% { transform: translateX(-81px) translateY(-82.7px); }
+  0% { transform: translateX(-93px) translateY(349.4px); }
+  64.20% { transform: translateX(-93px) translateY(-100px); }
+  64.21% { transform: translateX(-93px) translateY(600px); }
+  100% { transform: translateX(-93px) translateY(349.4px); }
 }
 
 .burn-goo-50 {
-  min-width: 69px;
-  min-height: 69px;
-  animation: burning-goo-50 1542ms 0ms infinite linear;
+  min-width: 117px;
+  min-height: 117px;
+  animation: burning-goo-50 3835ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-50 {
-  0% { transform: translateX(-248px) translateY(98.9px); }
-  90.40% { transform: translateX(-248px) translateY(-100px); }
-  90.41% { transform: translateX(-248px) translateY(120px); }
-  100% { transform: translateX(-248px) translateY(98.9px); }
+  0% { transform: translateX(189px) translateY(459.5px); }
+  79.93% { transform: translateX(189px) translateY(-100px); }
+  79.94% { transform: translateX(189px) translateY(600px); }
+  100% { transform: translateX(189px) translateY(459.5px); }
 }
 
 .burn-goo-51 {
-  min-width: 77px;
-  min-height: 77px;
-  animation: burning-goo-51 1981ms 0ms infinite linear;
+  min-width: 106px;
+  min-height: 106px;
+  animation: burning-goo-51 5913ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-51 {
-  0% { transform: translateX(-110px) translateY(86.2px); }
-  84.65% { transform: translateX(-110px) translateY(-100px); }
-  84.66% { transform: translateX(-110px) translateY(120px); }
-  100% { transform: translateX(-110px) translateY(86.2px); }
+  0% { transform: translateX(262px) translateY(492.7px); }
+  84.68% { transform: translateX(262px) translateY(-100px); }
+  84.69% { transform: translateX(262px) translateY(600px); }
+  100% { transform: translateX(262px) translateY(492.7px); }
 }
 
 .burn-goo-52 {
-  min-width: 51px;
-  min-height: 51px;
-  animation: burning-goo-52 1411ms 0ms infinite linear;
+  min-width: 48px;
+  min-height: 48px;
+  animation: burning-goo-52 2697ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-52 {
-  0% { transform: translateX(-84px) translateY(35.6px); }
-  61.64% { transform: translateX(-84px) translateY(-100px); }
-  61.65% { transform: translateX(-84px) translateY(120px); }
-  100% { transform: translateX(-84px) translateY(35.6px); }
+  0% { transform: translateX(-59px) translateY(393.8px); }
+  70.54% { transform: translateX(-59px) translateY(-100px); }
+  70.55% { transform: translateX(-59px) translateY(600px); }
+  100% { transform: translateX(-59px) translateY(393.8px); }
 }
 
 .burn-goo-53 {
-  min-width: 48px;
-  min-height: 48px;
-  animation: burning-goo-53 1522ms 0ms infinite linear;
+  min-width: 97px;
+  min-height: 97px;
+  animation: burning-goo-53 4528ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-53 {
-  0% { transform: translateX(-138px) translateY(-10.1px); }
-  40.86% { transform: translateX(-138px) translateY(-100px); }
-  40.87% { transform: translateX(-138px) translateY(120px); }
-  100% { transform: translateX(-138px) translateY(-10.1px); }
+  0% { transform: translateX(-192px) translateY(34.4px); }
+  19.20% { transform: translateX(-192px) translateY(-100px); }
+  19.21% { transform: translateX(-192px) translateY(600px); }
+  100% { transform: translateX(-192px) translateY(34.4px); }
 }
 
 .burn-goo-54 {
-  min-width: 34px;
-  min-height: 34px;
-  animation: burning-goo-54 1359ms 0ms infinite linear;
+  min-width: 90px;
+  min-height: 90px;
+  animation: burning-goo-54 5701ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-54 {
-  0% { transform: translateX(-200px) translateY(98.4px); }
-  90.17% { transform: translateX(-200px) translateY(-100px); }
-  90.18% { transform: translateX(-200px) translateY(120px); }
-  100% { transform: translateX(-200px) translateY(98.4px); }
+  0% { transform: translateX(-64px) translateY(-53.5px); }
+  6.64% { transform: translateX(-64px) translateY(-100px); }
+  6.65% { transform: translateX(-64px) translateY(600px); }
+  100% { transform: translateX(-64px) translateY(-53.5px); }
 }
 
 .burn-goo-55 {
-  min-width: 63px;
-  min-height: 63px;
-  animation: burning-goo-55 2157ms 0ms infinite linear;
+  min-width: 65px;
+  min-height: 65px;
+  animation: burning-goo-55 5678ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-55 {
-  0% { transform: translateX(36px) translateY(0.1px); }
-  45.48% { transform: translateX(36px) translateY(-100px); }
-  45.49% { transform: translateX(36px) translateY(120px); }
-  100% { transform: translateX(36px) translateY(0.1px); }
+  0% { transform: translateX(279px) translateY(376.9px); }
+  68.13% { transform: translateX(279px) translateY(-100px); }
+  68.14% { transform: translateX(279px) translateY(600px); }
+  100% { transform: translateX(279px) translateY(376.9px); }
 }
 
 .burn-goo-56 {
-  min-width: 23px;
-  min-height: 23px;
-  animation: burning-goo-56 2231ms 0ms infinite linear;
+  min-width: 88px;
+  min-height: 88px;
+  animation: burning-goo-56 4930ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-56 {
-  0% { transform: translateX(-87px) translateY(3.0px); }
-  46.80% { transform: translateX(-87px) translateY(-100px); }
-  46.81% { transform: translateX(-87px) translateY(120px); }
-  100% { transform: translateX(-87px) translateY(3.0px); }
+  0% { transform: translateX(45px) translateY(250.4px); }
+  50.06% { transform: translateX(45px) translateY(-100px); }
+  50.07% { transform: translateX(45px) translateY(600px); }
+  100% { transform: translateX(45px) translateY(250.4px); }
 }
 
 .burn-goo-57 {
-  min-width: 33px;
-  min-height: 33px;
-  animation: burning-goo-57 1348ms 0ms infinite linear;
+  min-width: 114px;
+  min-height: 114px;
+  animation: burning-goo-57 4437ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-57 {
-  0% { transform: translateX(216px) translateY(-64.4px); }
-  16.16% { transform: translateX(216px) translateY(-100px); }
-  16.17% { transform: translateX(216px) translateY(120px); }
-  100% { transform: translateX(216px) translateY(-64.4px); }
+  0% { transform: translateX(-14px) translateY(268.8px); }
+  52.69% { transform: translateX(-14px) translateY(-100px); }
+  52.70% { transform: translateX(-14px) translateY(600px); }
+  100% { transform: translateX(-14px) translateY(268.8px); }
 }
 
 .burn-goo-58 {
-  min-width: 59px;
-  min-height: 59px;
-  animation: burning-goo-58 2439ms 0ms infinite linear;
+  min-width: 99px;
+  min-height: 99px;
+  animation: burning-goo-58 3061ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-58 {
-  0% { transform: translateX(63px) translateY(-37.2px); }
-  28.56% { transform: translateX(63px) translateY(-100px); }
-  28.57% { transform: translateX(63px) translateY(120px); }
-  100% { transform: translateX(63px) translateY(-37.2px); }
+  0% { transform: translateX(-239px) translateY(576.3px); }
+  96.62% { transform: translateX(-239px) translateY(-100px); }
+  96.63% { transform: translateX(-239px) translateY(600px); }
+  100% { transform: translateX(-239px) translateY(576.3px); }
 }
 
 .burn-goo-59 {
-  min-width: 64px;
-  min-height: 64px;
-  animation: burning-goo-59 1799ms 0ms infinite linear;
+  min-width: 120px;
+  min-height: 120px;
+  animation: burning-goo-59 5042ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-59 {
-  0% { transform: translateX(-186px) translateY(91.9px); }
-  87.24% { transform: translateX(-186px) translateY(-100px); }
-  87.25% { transform: translateX(-186px) translateY(120px); }
-  100% { transform: translateX(-186px) translateY(91.9px); }
+  0% { transform: translateX(-6px) translateY(112.0px); }
+  30.29% { transform: translateX(-6px) translateY(-100px); }
+  30.30% { transform: translateX(-6px) translateY(600px); }
+  100% { transform: translateX(-6px) translateY(112.0px); }
 }
 
 .burn-goo-60 {
-  min-width: 58px;
-  min-height: 58px;
-  animation: burning-goo-60 1328ms 0ms infinite linear;
+  min-width: 47px;
+  min-height: 47px;
+  animation: burning-goo-60 5275ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-60 {
-  0% { transform: translateX(-2px) translateY(20.0px); }
-  54.55% { transform: translateX(-2px) translateY(-100px); }
-  54.56% { transform: translateX(-2px) translateY(120px); }
-  100% { transform: translateX(-2px) translateY(20.0px); }
+  0% { transform: translateX(136px) translateY(313.2px); }
+  59.03% { transform: translateX(136px) translateY(-100px); }
+  59.04% { transform: translateX(136px) translateY(600px); }
+  100% { transform: translateX(136px) translateY(313.2px); }
 }
 
 .burn-goo-61 {
-  min-width: 27px;
-  min-height: 27px;
-  animation: burning-goo-61 1820ms 0ms infinite linear;
+  min-width: 61px;
+  min-height: 61px;
+  animation: burning-goo-61 4272ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-61 {
-  0% { transform: translateX(-75px) translateY(71.3px); }
-  77.87% { transform: translateX(-75px) translateY(-100px); }
-  77.88% { transform: translateX(-75px) translateY(120px); }
-  100% { transform: translateX(-75px) translateY(71.3px); }
+  0% { transform: translateX(-52px) translateY(576.4px); }
+  96.63% { transform: translateX(-52px) translateY(-100px); }
+  96.64% { transform: translateX(-52px) translateY(600px); }
+  100% { transform: translateX(-52px) translateY(576.4px); }
 }
 
 .burn-goo-62 {
-  min-width: 43px;
-  min-height: 43px;
-  animation: burning-goo-62 1688ms 0ms infinite linear;
+  min-width: 57px;
+  min-height: 57px;
+  animation: burning-goo-62 3077ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-62 {
-  0% { transform: translateX(161px) translateY(117.7px); }
-  98.95% { transform: translateX(161px) translateY(-100px); }
-  98.96% { transform: translateX(161px) translateY(120px); }
-  100% { transform: translateX(161px) translateY(117.7px); }
+  0% { transform: translateX(21px) translateY(17.1px); }
+  16.73% { transform: translateX(21px) translateY(-100px); }
+  16.74% { transform: translateX(21px) translateY(600px); }
+  100% { transform: translateX(21px) translateY(17.1px); }
 }
 
 .burn-goo-63 {
-  min-width: 26px;
-  min-height: 26px;
-  animation: burning-goo-63 1577ms 0ms infinite linear;
+  min-width: 103px;
+  min-height: 103px;
+  animation: burning-goo-63 4688ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-63 {
-  0% { transform: translateX(-67px) translateY(103.0px); }
-  92.26% { transform: translateX(-67px) translateY(-100px); }
-  92.27% { transform: translateX(-67px) translateY(120px); }
-  100% { transform: translateX(-67px) translateY(103.0px); }
+  0% { transform: translateX(211px) translateY(263.2px); }
+  51.89% { transform: translateX(211px) translateY(-100px); }
+  51.90% { transform: translateX(211px) translateY(600px); }
+  100% { transform: translateX(211px) translateY(263.2px); }
 }
 
 .burn-goo-64 {
-  min-width: 21px;
-  min-height: 21px;
-  animation: burning-goo-64 2422ms 0ms infinite linear;
+  min-width: 84px;
+  min-height: 84px;
+  animation: burning-goo-64 4548ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-64 {
-  0% { transform: translateX(214px) translateY(34.5px); }
-  61.13% { transform: translateX(214px) translateY(-100px); }
-  61.14% { transform: translateX(214px) translateY(120px); }
-  100% { transform: translateX(214px) translateY(34.5px); }
+  0% { transform: translateX(162px) translateY(67.2px); }
+  23.89% { transform: translateX(162px) translateY(-100px); }
+  23.90% { transform: translateX(162px) translateY(600px); }
+  100% { transform: translateX(162px) translateY(67.2px); }
 }
 
 .burn-goo-65 {
-  min-width: 40px;
-  min-height: 40px;
-  animation: burning-goo-65 1254ms 0ms infinite linear;
+  min-width: 107px;
+  min-height: 107px;
+  animation: burning-goo-65 3887ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-65 {
-  0% { transform: translateX(222px) translateY(43.6px); }
-  65.26% { transform: translateX(222px) translateY(-100px); }
-  65.27% { transform: translateX(222px) translateY(120px); }
-  100% { transform: translateX(222px) translateY(43.6px); }
+  0% { transform: translateX(-125px) translateY(-40.1px); }
+  8.55% { transform: translateX(-125px) translateY(-100px); }
+  8.56% { transform: translateX(-125px) translateY(600px); }
+  100% { transform: translateX(-125px) translateY(-40.1px); }
 }
 
 .burn-goo-66 {
-  min-width: 56px;
-  min-height: 56px;
-  animation: burning-goo-66 1823ms 0ms infinite linear;
+  min-width: 48px;
+  min-height: 48px;
+  animation: burning-goo-66 4254ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-66 {
-  0% { transform: translateX(-140px) translateY(61.4px); }
-  73.37% { transform: translateX(-140px) translateY(-100px); }
-  73.38% { transform: translateX(-140px) translateY(120px); }
-  100% { transform: translateX(-140px) translateY(61.4px); }
+  0% { transform: translateX(-248px) translateY(510.4px); }
+  87.21% { transform: translateX(-248px) translateY(-100px); }
+  87.22% { transform: translateX(-248px) translateY(600px); }
+  100% { transform: translateX(-248px) translateY(510.4px); }
 }
 
 .burn-goo-67 {
-  min-width: 33px;
-  min-height: 33px;
-  animation: burning-goo-67 1276ms 0ms infinite linear;
+  min-width: 114px;
+  min-height: 114px;
+  animation: burning-goo-67 4692ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-67 {
-  0% { transform: translateX(234px) translateY(5.2px); }
-  47.84% { transform: translateX(234px) translateY(-100px); }
-  47.85% { transform: translateX(234px) translateY(120px); }
-  100% { transform: translateX(234px) translateY(5.2px); }
+  0% { transform: translateX(61px) translateY(163.5px); }
+  37.64% { transform: translateX(61px) translateY(-100px); }
+  37.65% { transform: translateX(61px) translateY(600px); }
+  100% { transform: translateX(61px) translateY(163.5px); }
 }
 
 .burn-goo-68 {
-  min-width: 59px;
-  min-height: 59px;
-  animation: burning-goo-68 1284ms 0ms infinite linear;
+  min-width: 41px;
+  min-height: 41px;
+  animation: burning-goo-68 4131ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-68 {
-  0% { transform: translateX(116px) translateY(9.5px); }
-  49.76% { transform: translateX(116px) translateY(-100px); }
-  49.77% { transform: translateX(116px) translateY(120px); }
-  100% { transform: translateX(116px) translateY(9.5px); }
+  0% { transform: translateX(-246px) translateY(134.0px); }
+  33.43% { transform: translateX(-246px) translateY(-100px); }
+  33.44% { transform: translateX(-246px) translateY(600px); }
+  100% { transform: translateX(-246px) translateY(134.0px); }
 }
 
 .burn-goo-69 {
-  min-width: 46px;
-  min-height: 46px;
-  animation: burning-goo-69 2300ms 0ms infinite linear;
+  min-width: 90px;
+  min-height: 90px;
+  animation: burning-goo-69 5823ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-69 {
-  0% { transform: translateX(189px) translateY(17.9px); }
-  53.59% { transform: translateX(189px) translateY(-100px); }
-  53.60% { transform: translateX(189px) translateY(120px); }
-  100% { transform: translateX(189px) translateY(17.9px); }
+  0% { transform: translateX(133px) translateY(-27.9px); }
+  10.29% { transform: translateX(133px) translateY(-100px); }
+  10.30% { transform: translateX(133px) translateY(600px); }
+  100% { transform: translateX(133px) translateY(-27.9px); }
 }
 
 .burn-goo-70 {
-  min-width: 49px;
-  min-height: 49px;
-  animation: burning-goo-70 1227ms 0ms infinite linear;
+  min-width: 100px;
+  min-height: 100px;
+  animation: burning-goo-70 3760ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-70 {
-  0% { transform: translateX(-21px) translateY(-35.6px); }
-  29.26% { transform: translateX(-21px) translateY(-100px); }
-  29.27% { transform: translateX(-21px) translateY(120px); }
-  100% { transform: translateX(-21px) translateY(-35.6px); }
+  0% { transform: translateX(-203px) translateY(-36.8px); }
+  9.03% { transform: translateX(-203px) translateY(-100px); }
+  9.04% { transform: translateX(-203px) translateY(600px); }
+  100% { transform: translateX(-203px) translateY(-36.8px); }
 }
 
 .burn-goo-71 {
-  min-width: 75px;
-  min-height: 75px;
-  animation: burning-goo-71 1508ms 0ms infinite linear;
+  min-width: 110px;
+  min-height: 110px;
+  animation: burning-goo-71 2663ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-71 {
-  0% { transform: translateX(237px) translateY(98.3px); }
-  90.12% { transform: translateX(237px) translateY(-100px); }
-  90.13% { transform: translateX(237px) translateY(120px); }
-  100% { transform: translateX(237px) translateY(98.3px); }
+  0% { transform: translateX(-234px) translateY(156.7px); }
+  36.67% { transform: translateX(-234px) translateY(-100px); }
+  36.68% { transform: translateX(-234px) translateY(600px); }
+  100% { transform: translateX(-234px) translateY(156.7px); }
 }
 
 .burn-goo-72 {
-  min-width: 24px;
-  min-height: 24px;
-  animation: burning-goo-72 2277ms 0ms infinite linear;
+  min-width: 100px;
+  min-height: 100px;
+  animation: burning-goo-72 3539ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-72 {
-  0% { transform: translateX(-167px) translateY(27.8px); }
-  58.08% { transform: translateX(-167px) translateY(-100px); }
-  58.09% { transform: translateX(-167px) translateY(120px); }
-  100% { transform: translateX(-167px) translateY(27.8px); }
+  0% { transform: translateX(-271px) translateY(340.5px); }
+  62.93% { transform: translateX(-271px) translateY(-100px); }
+  62.94% { transform: translateX(-271px) translateY(600px); }
+  100% { transform: translateX(-271px) translateY(340.5px); }
 }
 
 .burn-goo-73 {
-  min-width: 28px;
-  min-height: 28px;
-  animation: burning-goo-73 1857ms 0ms infinite linear;
+  min-width: 41px;
+  min-height: 41px;
+  animation: burning-goo-73 2504ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-73 {
-  0% { transform: translateX(103px) translateY(106.7px); }
-  93.96% { transform: translateX(103px) translateY(-100px); }
-  93.97% { transform: translateX(103px) translateY(120px); }
-  100% { transform: translateX(103px) translateY(106.7px); }
+  0% { transform: translateX(-62px) translateY(188.7px); }
+  41.24% { transform: translateX(-62px) translateY(-100px); }
+  41.25% { transform: translateX(-62px) translateY(600px); }
+  100% { transform: translateX(-62px) translateY(188.7px); }
 }
 
 .burn-goo-74 {
-  min-width: 36px;
-  min-height: 36px;
-  animation: burning-goo-74 2397ms 0ms infinite linear;
+  min-width: 52px;
+  min-height: 52px;
+  animation: burning-goo-74 3858ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-74 {
-  0% { transform: translateX(-98px) translateY(79.9px); }
-  81.78% { transform: translateX(-98px) translateY(-100px); }
-  81.79% { transform: translateX(-98px) translateY(120px); }
-  100% { transform: translateX(-98px) translateY(79.9px); }
+  0% { transform: translateX(-202px) translateY(546.1px); }
+  92.30% { transform: translateX(-202px) translateY(-100px); }
+  92.31% { transform: translateX(-202px) translateY(600px); }
+  100% { transform: translateX(-202px) translateY(546.1px); }
 }
 
 .burn-goo-75 {
-  min-width: 33px;
-  min-height: 33px;
-  animation: burning-goo-75 2480ms 0ms infinite linear;
+  min-width: 43px;
+  min-height: 43px;
+  animation: burning-goo-75 2579ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-75 {
-  0% { transform: translateX(74px) translateY(-71.9px); }
-  12.79% { transform: translateX(74px) translateY(-100px); }
-  12.80% { transform: translateX(74px) translateY(120px); }
-  100% { transform: translateX(74px) translateY(-71.9px); }
+  0% { transform: translateX(216px) translateY(133.0px); }
+  33.28% { transform: translateX(216px) translateY(-100px); }
+  33.29% { transform: translateX(216px) translateY(600px); }
+  100% { transform: translateX(216px) translateY(133.0px); }
 }
 
 .burn-goo-76 {
-  min-width: 48px;
-  min-height: 48px;
-  animation: burning-goo-76 2135ms 0ms infinite linear;
+  min-width: 63px;
+  min-height: 63px;
+  animation: burning-goo-76 3360ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-76 {
-  0% { transform: translateX(139px) translateY(36.5px); }
-  62.03% { transform: translateX(139px) translateY(-100px); }
-  62.04% { transform: translateX(139px) translateY(120px); }
-  100% { transform: translateX(139px) translateY(36.5px); }
+  0% { transform: translateX(111px) translateY(258.1px); }
+  51.16% { transform: translateX(111px) translateY(-100px); }
+  51.17% { transform: translateX(111px) translateY(600px); }
+  100% { transform: translateX(111px) translateY(258.1px); }
 }
 
 .burn-goo-77 {
-  min-width: 74px;
-  min-height: 74px;
-  animation: burning-goo-77 1551ms 0ms infinite linear;
+  min-width: 67px;
+  min-height: 67px;
+  animation: burning-goo-77 5477ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-77 {
-  0% { transform: translateX(-233px) translateY(-2.0px); }
-  44.53% { transform: translateX(-233px) translateY(-100px); }
-  44.54% { transform: translateX(-233px) translateY(120px); }
-  100% { transform: translateX(-233px) translateY(-2.0px); }
+  0% { transform: translateX(103px) translateY(585.2px); }
+  97.88% { transform: translateX(103px) translateY(-100px); }
+  97.89% { transform: translateX(103px) translateY(600px); }
+  100% { transform: translateX(103px) translateY(585.2px); }
 }
 
 .burn-goo-78 {
-  min-width: 60px;
-  min-height: 60px;
-  animation: burning-goo-78 1354ms 0ms infinite linear;
+  min-width: 67px;
+  min-height: 67px;
+  animation: burning-goo-78 4348ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-78 {
-  0% { transform: translateX(86px) translateY(-24.5px); }
-  34.33% { transform: translateX(86px) translateY(-100px); }
-  34.34% { transform: translateX(86px) translateY(120px); }
-  100% { transform: translateX(86px) translateY(-24.5px); }
+  0% { transform: translateX(78px) translateY(215.1px); }
+  45.01% { transform: translateX(78px) translateY(-100px); }
+  45.02% { transform: translateX(78px) translateY(600px); }
+  100% { transform: translateX(78px) translateY(215.1px); }
 }
 
 .burn-goo-79 {
-  min-width: 27px;
-  min-height: 27px;
-  animation: burning-goo-79 1736ms 0ms infinite linear;
+  min-width: 105px;
+  min-height: 105px;
+  animation: burning-goo-79 5787ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-79 {
-  0% { transform: translateX(-243px) translateY(-84.1px); }
-  7.20% { transform: translateX(-243px) translateY(-100px); }
-  7.21% { transform: translateX(-243px) translateY(120px); }
-  100% { transform: translateX(-243px) translateY(-84.1px); }
+  0% { transform: translateX(-239px) translateY(374.3px); }
+  67.75% { transform: translateX(-239px) translateY(-100px); }
+  67.76% { transform: translateX(-239px) translateY(600px); }
+  100% { transform: translateX(-239px) translateY(374.3px); }
 }
 
 .burn-goo-80 {
-  min-width: 52px;
-  min-height: 52px;
-  animation: burning-goo-80 1790ms 0ms infinite linear;
+  min-width: 67px;
+  min-height: 67px;
+  animation: burning-goo-80 5743ms 0ms infinite linear;
 }
 
 @keyframes burning-goo-80 {
-  0% { transform: translateX(217px) translateY(-40.9px); }
-  26.87% { transform: translateX(217px) translateY(-100px); }
-  26.88% { transform: translateX(217px) translateY(120px); }
-  100% { transform: translateX(217px) translateY(-40.9px); }
-}
-
-.burn-goo-81 {
-  min-width: 25px;
-  min-height: 25px;
-  animation: burning-goo-81 2318ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-81 {
-  0% { transform: translateX(74px) translateY(-1.9px); }
-  44.59% { transform: translateX(74px) translateY(-100px); }
-  44.60% { transform: translateX(74px) translateY(120px); }
-  100% { transform: translateX(74px) translateY(-1.9px); }
-}
-
-.burn-goo-82 {
-  min-width: 23px;
-  min-height: 23px;
-  animation: burning-goo-82 1659ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-82 {
-  0% { transform: translateX(-152px) translateY(-84.3px); }
-  7.15% { transform: translateX(-152px) translateY(-100px); }
-  7.16% { transform: translateX(-152px) translateY(120px); }
-  100% { transform: translateX(-152px) translateY(-84.3px); }
-}
-
-.burn-goo-83 {
-  min-width: 28px;
-  min-height: 28px;
-  animation: burning-goo-83 2097ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-83 {
-  0% { transform: translateX(59px) translateY(-29.4px); }
-  32.11% { transform: translateX(59px) translateY(-100px); }
-  32.12% { transform: translateX(59px) translateY(120px); }
-  100% { transform: translateX(59px) translateY(-29.4px); }
-}
-
-.burn-goo-84 {
-  min-width: 70px;
-  min-height: 70px;
-  animation: burning-goo-84 1817ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-84 {
-  0% { transform: translateX(-98px) translateY(-23.3px); }
-  34.87% { transform: translateX(-98px) translateY(-100px); }
-  34.88% { transform: translateX(-98px) translateY(120px); }
-  100% { transform: translateX(-98px) translateY(-23.3px); }
-}
-
-.burn-goo-85 {
-  min-width: 42px;
-  min-height: 42px;
-  animation: burning-goo-85 1705ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-85 {
-  0% { transform: translateX(-61px) translateY(52.6px); }
-  69.36% { transform: translateX(-61px) translateY(-100px); }
-  69.37% { transform: translateX(-61px) translateY(120px); }
-  100% { transform: translateX(-61px) translateY(52.6px); }
-}
-
-.burn-goo-86 {
-  min-width: 22px;
-  min-height: 22px;
-  animation: burning-goo-86 2196ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-86 {
-  0% { transform: translateX(-244px) translateY(88.5px); }
-  85.68% { transform: translateX(-244px) translateY(-100px); }
-  85.69% { transform: translateX(-244px) translateY(120px); }
-  100% { transform: translateX(-244px) translateY(88.5px); }
-}
-
-.burn-goo-87 {
-  min-width: 39px;
-  min-height: 39px;
-  animation: burning-goo-87 1604ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-87 {
-  0% { transform: translateX(-103px) translateY(58.8px); }
-  72.18% { transform: translateX(-103px) translateY(-100px); }
-  72.19% { transform: translateX(-103px) translateY(120px); }
-  100% { transform: translateX(-103px) translateY(58.8px); }
-}
-
-.burn-goo-88 {
-  min-width: 69px;
-  min-height: 69px;
-  animation: burning-goo-88 2262ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-88 {
-  0% { transform: translateX(34px) translateY(87.3px); }
-  85.14% { transform: translateX(34px) translateY(-100px); }
-  85.15% { transform: translateX(34px) translateY(120px); }
-  100% { transform: translateX(34px) translateY(87.3px); }
-}
-
-.burn-goo-89 {
-  min-width: 38px;
-  min-height: 38px;
-  animation: burning-goo-89 1953ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-89 {
-  0% { transform: translateX(-169px) translateY(-66.8px); }
-  15.10% { transform: translateX(-169px) translateY(-100px); }
-  15.11% { transform: translateX(-169px) translateY(120px); }
-  100% { transform: translateX(-169px) translateY(-66.8px); }
-}
-
-.burn-goo-90 {
-  min-width: 67px;
-  min-height: 67px;
-  animation: burning-goo-90 2030ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-90 {
-  0% { transform: translateX(250px) translateY(63.6px); }
-  74.37% { transform: translateX(250px) translateY(-100px); }
-  74.38% { transform: translateX(250px) translateY(120px); }
-  100% { transform: translateX(250px) translateY(63.6px); }
-}
-
-.burn-goo-91 {
-  min-width: 57px;
-  min-height: 57px;
-  animation: burning-goo-91 2389ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-91 {
-  0% { transform: translateX(-119px) translateY(-84.3px); }
-  7.16% { transform: translateX(-119px) translateY(-100px); }
-  7.17% { transform: translateX(-119px) translateY(120px); }
-  100% { transform: translateX(-119px) translateY(-84.3px); }
-}
-
-.burn-goo-92 {
-  min-width: 34px;
-  min-height: 34px;
-  animation: burning-goo-92 1730ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-92 {
-  0% { transform: translateX(-41px) translateY(-70.4px); }
-  13.45% { transform: translateX(-41px) translateY(-100px); }
-  13.46% { transform: translateX(-41px) translateY(120px); }
-  100% { transform: translateX(-41px) translateY(-70.4px); }
-}
-
-.burn-goo-93 {
-  min-width: 56px;
-  min-height: 56px;
-  animation: burning-goo-93 2210ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-93 {
-  0% { transform: translateX(120px) translateY(-24.7px); }
-  34.22% { transform: translateX(120px) translateY(-100px); }
-  34.23% { transform: translateX(120px) translateY(120px); }
-  100% { transform: translateX(120px) translateY(-24.7px); }
-}
-
-.burn-goo-94 {
-  min-width: 47px;
-  min-height: 47px;
-  animation: burning-goo-94 2299ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-94 {
-  0% { transform: translateX(-107px) translateY(-88.4px); }
-  5.29% { transform: translateX(-107px) translateY(-100px); }
-  5.30% { transform: translateX(-107px) translateY(120px); }
-  100% { transform: translateX(-107px) translateY(-88.4px); }
-}
-
-.burn-goo-95 {
-  min-width: 70px;
-  min-height: 70px;
-  animation: burning-goo-95 1777ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-95 {
-  0% { transform: translateX(-215px) translateY(116.7px); }
-  98.50% { transform: translateX(-215px) translateY(-100px); }
-  98.51% { transform: translateX(-215px) translateY(120px); }
-  100% { transform: translateX(-215px) translateY(116.7px); }
-}
-
-.burn-goo-96 {
-  min-width: 42px;
-  min-height: 42px;
-  animation: burning-goo-96 1233ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-96 {
-  0% { transform: translateX(195px) translateY(-42.7px); }
-  26.05% { transform: translateX(195px) translateY(-100px); }
-  26.06% { transform: translateX(195px) translateY(120px); }
-  100% { transform: translateX(195px) translateY(-42.7px); }
-}
-
-.burn-goo-97 {
-  min-width: 34px;
-  min-height: 34px;
-  animation: burning-goo-97 1472ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-97 {
-  0% { transform: translateX(-180px) translateY(88.9px); }
-  85.88% { transform: translateX(-180px) translateY(-100px); }
-  85.89% { transform: translateX(-180px) translateY(120px); }
-  100% { transform: translateX(-180px) translateY(88.9px); }
-}
-
-.burn-goo-98 {
-  min-width: 68px;
-  min-height: 68px;
-  animation: burning-goo-98 1268ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-98 {
-  0% { transform: translateX(-247px) translateY(-64.3px); }
-  16.22% { transform: translateX(-247px) translateY(-100px); }
-  16.23% { transform: translateX(-247px) translateY(120px); }
-  100% { transform: translateX(-247px) translateY(-64.3px); }
-}
-
-.burn-goo-99 {
-  min-width: 25px;
-  min-height: 25px;
-  animation: burning-goo-99 2411ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-99 {
-  0% { transform: translateX(-204px) translateY(5.1px); }
-  47.78% { transform: translateX(-204px) translateY(-100px); }
-  47.79% { transform: translateX(-204px) translateY(120px); }
-  100% { transform: translateX(-204px) translateY(5.1px); }
-}
-
-.burn-goo-100 {
-  min-width: 46px;
-  min-height: 46px;
-  animation: burning-goo-100 1666ms 0ms infinite linear;
-}
-
-@keyframes burning-goo-100 {
-  0% { transform: translateX(-31px) translateY(91.8px); }
-  87.20% { transform: translateX(-31px) translateY(-100px); }
-  87.21% { transform: translateX(-31px) translateY(120px); }
-  100% { transform: translateX(-31px) translateY(91.8px); }
+  0% { transform: translateX(-144px) translateY(430.7px); }
+  75.81% { transform: translateX(-144px) translateY(-100px); }
+  75.82% { transform: translateX(-144px) translateY(600px); }
+  100% { transform: translateX(-144px) translateY(430.7px); }
 }
 

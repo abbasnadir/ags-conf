@@ -303,32 +303,44 @@ function Media() {
 function Network() {
     if (!AstalNetwork) {
         return (
-            <button cssClasses={["network"]} onClicked={() => app.toggle_window("network")}>
+            <button cssClasses={["network", "tray-item"]} onClicked={() => app.toggle_window("network")}>
                 <image iconName="network-wireless-offline-symbolic" />
             </button>
         )
     }
     
     const net = AstalNetwork.get_default()
+    const [icon, setIcon] = createState("network-wireless-offline-symbolic")
     
-    // We bind directly to net.wifi's icon-name if available
-    const iconName = createComputed(() => {
-        // Unfortunately in AstalNetwork, we can't easily bind to a nested property if it might be null.
-        // We will just bind to net.wifi icon directly.
-        return ""
+    const update = () => {
+        if (net.wifi) {
+            setIcon(net.wifi.icon_name || "network-wireless-offline-symbolic")
+        } else {
+            setIcon("network-wireless-offline-symbolic")
+        }
+    }
+    
+    // Connect to wifi changes
+    net.connect("notify::wifi", () => {
+        update()
+        if (net.wifi) {
+            net.wifi.connect("notify::icon-name", update)
+        }
     })
+    
+    if (net.wifi) {
+        net.wifi.connect("notify::icon-name", update)
+    }
+    
+    // Initial state
+    update()
     
     return (
         <button 
-            cssClasses={["network"]}
+            cssClasses={["network", "tray-item"]}
             onClicked={() => app.toggle_window("network")}
         >
-            <With value={createBinding(net, "wifi")}>
-                {(wifi: any) => {
-                    if (!wifi) return <image iconName="network-wireless-offline-symbolic" />
-                    return <image iconName={createBinding(wifi, "icon-name")} />
-                }}
-            </With>
+            <image iconName={icon} />
         </button>
     )
 }
@@ -336,28 +348,35 @@ function Network() {
 function Bluetooth() {
     if (!AstalBluetooth) {
         return (
-            <button cssClasses={["bluetooth"]} onClicked={() => app.toggle_window("bluetooth")}>
+            <button cssClasses={["bluetooth", "tray-item"]} onClicked={() => app.toggle_window("bluetooth")}>
                 <image iconName="bluetooth-disabled-symbolic" />
             </button>
         )
     }
     
     const bt = AstalBluetooth.get_default()
-    const isPowered = createBinding(bt, "is-powered")
-    const isConnected = createBinding(bt, "is-connected")
+    const [icon, setIcon] = createState("bluetooth-disabled-symbolic")
     
-    const iconName = createComputed(() => {
-        if (!isPowered()) return "bluetooth-disabled-symbolic"
-        if (isConnected()) return "bluetooth-active-symbolic"
-        return "bluetooth-disconnected-symbolic"
-    })
+    const update = () => {
+        if (!bt.is_powered) {
+            setIcon("bluetooth-disabled-symbolic")
+        } else if (bt.is_connected) {
+            setIcon("bluetooth-active-symbolic")
+        } else {
+            setIcon("bluetooth-disconnected-symbolic")
+        }
+    }
+    
+    bt.connect("notify::is-powered", update)
+    bt.connect("notify::is-connected", update)
+    update()
     
     return (
         <button 
-            cssClasses={["bluetooth"]}
+            cssClasses={["bluetooth", "tray-item"]}
             onClicked={() => app.toggle_window("bluetooth")}
         >
-            <image iconName={iconName} />
+            <image iconName={icon} />
         </button>
     )
 }
@@ -402,6 +421,12 @@ export default function Bar() {
                     center_widget={
                         <box halign={Gtk.Align.CENTER} spacing={12}>
                             <Network />
+                            <button 
+                                cssClasses={["tray-item"]}
+                                onClicked={() => app.toggle_window("powermenu")}
+                            >
+                                <image iconName="system-shutdown-symbolic" />
+                            </button>
                             <Bluetooth />
                         </box>
                     }
@@ -409,13 +434,9 @@ export default function Bar() {
                         <box halign={Gtk.Align.END} spacing={12}>
                             <button 
                                 cssClasses={["tray-item"]}
-                                onClicked={() => app.toggle_window("powermenu")}
-                            >
-                                <image iconName="system-shutdown-symbolic" />
-                            </button>
-                            <button 
-                                cssClasses={["tray-item"]}
-                                onClicked={() => app.toggle_window("notifications")}
+                                onClicked={() => {
+                                    GLib.spawn_command_line_async("swaync-client -t")
+                                }}
                             >
                                 <image iconName="preferences-system-notifications-symbolic" />
                             </button>

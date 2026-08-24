@@ -13,9 +13,8 @@ export default function PowerMenuWindow() {
             layer={Astal.Layer.OVERLAY}
             exclusivity={Astal.Exclusivity.IGNORE}
             keymode={Astal.Keymode.ON_DEMAND}
-            anchor={Astal.WindowAnchor.BOTTOM | Astal.WindowAnchor.RIGHT}
+            anchor={Astal.WindowAnchor.BOTTOM}
             margin-bottom={50}
-            margin-right={10}
             $={(self) => {
                 self.connect("notify::is-active", () => {
                     if (!self.is_active && self.visible) {

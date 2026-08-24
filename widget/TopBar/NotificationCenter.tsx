@@ -49,7 +49,7 @@ function NotificationItem({ n }: { n: any }) {
 }
 
 export default function NotificationCenter() {
-    if (!AstalNotifd) return <window name="notifications" visible={false} />
+    if (!AstalNotifd) return <window name="notifications" application={app} visible={false}><box/></window>
     const notifd = AstalNotifd.get_default()
     const notifications = createBinding(notifd, "notifications")
 
