@@ -25,16 +25,19 @@ if (theme) {
     theme.add_search_path(GLib.get_home_dir() + "/.icons")
 }
 
+const iconCache = new Map<string, string>()
 const getIconName = (cls: string | null | undefined) => {
     if (!cls) return "application-x-executable"
+    if (iconCache.has(cls)) return iconCache.get(cls)!
     if (!theme) return "application-x-executable"
     
-    if (theme.has_icon(cls)) return cls
-    if (theme.has_icon(cls.toLowerCase())) return cls.toLowerCase()
+    let result = "application-x-executable"
+    if (theme.has_icon(cls)) result = cls
+    else if (theme.has_icon(cls.toLowerCase())) result = cls.toLowerCase()
+    else if (cls === "code-oss") result = "com.visualstudio.code.oss"
     
-    if (cls === "code-oss") return "com.visualstudio.code.oss"
-    
-    return "application-x-executable"
+    iconCache.set(cls, result)
+    return result
 }
 
 
@@ -411,6 +414,7 @@ export default function Bar() {
                 Astal.WindowAnchor.RIGHT
             }>
             <overlay>
+                <ParticleOrb />
                 <Gtk.CenterBox 
                     cssClasses={["bar-layout"]}
                     start_widget={
@@ -446,7 +450,6 @@ export default function Bar() {
                         </box>
                     }
                 />
-                <ParticleOrb />
             </overlay>
         </window>
     )

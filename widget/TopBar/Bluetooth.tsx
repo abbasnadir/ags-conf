@@ -8,18 +8,20 @@ let AstalBluetooth: any = null
 try { AstalBluetooth = (await import("gi://AstalBluetooth")).default } catch (e) { }
 
 function DeviceItem({ device }: { device: any }) {
-    const connected = createBinding(device, "connected")
-    const connecting = createBinding(device, "connecting")
-    const paired = createBinding(device, "paired")
-    const trusted = createBinding(device, "trusted")
+    const [connected, setConnected] = createState(device.connected)
+    const [connecting, setConnecting] = createState(device.connecting)
+    const [paired, setPaired] = createState(device.paired)
+    const [trusted, setTrusted] = createState(device.trusted)
+    
+    device.connect("notify::connected", () => setConnected(device.connected))
+    device.connect("notify::connecting", () => setConnecting(device.connecting))
+    device.connect("notify::paired", () => setPaired(device.paired))
+    device.connect("notify::trusted", () => setTrusted(device.trusted))
     
     const statusLabel = createComputed(() => {
-        const conn = connected()
-        const cnct = connecting()
-        const prd = paired()
-        if (conn) return "Connected"
-        if (cnct) return "Connecting..."
-        if (prd) return "Paired"
+        if (connected()) return "Connected"
+        if (connecting()) return "Connecting..."
+        if (paired()) return "Paired"
         return "Available"
     })
     
@@ -31,44 +33,47 @@ function DeviceItem({ device }: { device: any }) {
                 <label label={statusLabel} cssClasses={["dim", "small-text"]} halign={Gtk.Align.START} />
             </box>
             <box spacing={4}>
-                <With value={paired}>
-                    {(prd: boolean) => {
-                        if (!prd) {
-                            return (
+                {createComputed(() => {
+                    if (!paired()) {
+                        return (
+                            <button 
+                                cssClasses={["bluetooth-connect-btn"]}
+                                onClicked={() => {
+                                    try { device.pair() } catch (e) { console.error("Pairing timeout/error:", e) }
+                                }}
+                            >
+                                <label label="Pair" />
+                            </button>
+                        )
+                    } else {
+                        return (
+                            <box spacing={4}>
+                                {!trusted() ? (
+                                    <button 
+                                        cssClasses={["bluetooth-icon-btn"]}
+                                        tooltipText="Trust Device"
+                                        onClicked={() => device.set_trusted(true)}
+                                    >
+                                        <image iconName="security-high-symbolic" />
+                                    </button>
+                                ) : <box />}
                                 <button 
                                     cssClasses={["bluetooth-connect-btn"]}
-                                    onClicked={() => device.pair(() => {})}
+                                    onClicked={() => {
+                                        try {
+                                            if (device.connected) device.disconnect_device()
+                                            else device.connect_device()
+                                        } catch (e) {
+                                            console.error("Connection timeout/error:", e)
+                                        }
+                                    }}
                                 >
-                                    <label label="Pair" />
+                                    <label label={connected() ? "Disconnect" : "Connect"} />
                                 </button>
-                            )
-                        } else {
-                            return (
-                                <box spacing={4}>
-                                    <With value={trusted}>
-                                        {(trst: boolean) => !trst ? (
-                                            <button 
-                                                cssClasses={["bluetooth-connect-btn"]}
-                                                onClicked={() => device.set_trusted(true)}
-                                            >
-                                                <image iconName="security-high-symbolic" tooltipText="Trust Device" />
-                                            </button>
-                                        ) : <box />}
-                                    </With>
-                                    <button 
-                                        cssClasses={["bluetooth-connect-btn"]}
-                                        onClicked={() => {
-                                            if (device.connected) device.disconnect_device(() => {})
-                                            else device.connect_device(() => {})
-                                        }}
-                                    >
-                                        <label label={createComputed(() => connected() ? "Disconnect" : "Connect")} />
-                                    </button>
-                                </box>
-                            )
-                        }
-                    }}
-                </With>
+                            </box>
+                        )
+                    }
+                })}
             </box>
         </box>
     )

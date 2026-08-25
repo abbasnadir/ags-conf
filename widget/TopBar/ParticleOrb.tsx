@@ -9,7 +9,7 @@ export default function ParticleOrb() {
     }
     
     const wrap = (
-        <box $type="overlay" cssClasses={["orb-wrap"]} halign={Gtk.Align.FILL} hexpand={true} valign={Gtk.Align.CENTER} canFocus={false} visible={false}>
+        <box $type="overlay" cssClasses={["orb-wrap"]} halign={Gtk.Align.FILL} hexpand={true} valign={Gtk.Align.CENTER} canFocus={false} canTarget={false} visible={false}>
             {particles}
         </box>
     ) as any

@@ -15,7 +15,7 @@ export default function Flames() {
     )
 
     return (
-        <box cssClasses={["ember-wrap"]} halign={Gtk.Align.FILL} hexpand={true} valign={Gtk.Align.FILL} vexpand={true} canFocus={false}>
+        <box cssClasses={["ember-wrap"]} halign={Gtk.Align.FILL} hexpand={true} valign={Gtk.Align.FILL} vexpand={true} canFocus={false} canTarget={false}>
             {fire}
         </box>
     ) as any
